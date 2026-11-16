@@ -161,6 +161,7 @@ public final class TimezoneStore: ObservableObject {
         }
 
         self.widgetHourOffset = sharedDefaults.integer(forKey: Keys.widgetHourOffset)
+        self.activeReferenceCityID = UUID()
         self.activeReferenceCityID = self.homeCity.id
 
         startLiveClockIfNeeded()
