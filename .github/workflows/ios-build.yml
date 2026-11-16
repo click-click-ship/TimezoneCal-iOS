@@ -1,0 +1,46 @@
+name: Build TimezoneCal iOS (.ipa)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-unsigned-ipa:
+    name: Compile iOS App + WidgetKit Extension (macOS Runner)
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project from project.yml
+        run: xcodegen generate
+
+      - name: Build iOS App & WidgetKit Extension (Unsigned for Free Sideloading)
+        run: |
+          xcodebuild clean build \
+            -project TimezoneCal.xcodeproj \
+            -scheme TimezoneCal \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Package .app into TimezoneCal.ipa for SideStore / AltStore / Sideloadly
+        run: |
+          mkdir -p Payload
+          cp -r build/Build/Products/Release-iphoneos/TimezoneCal.app Payload/
+          zip -r9 TimezoneCal-Unsigned.ipa Payload
+
+      - name: Upload Downloadable .ipa Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TimezoneCal-Unsigned-IPA
+          path: TimezoneCal-Unsigned.ipa
+          retention-days: 30

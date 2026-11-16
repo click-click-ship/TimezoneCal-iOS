@@ -1,0 +1,67 @@
+name: TimezoneCal
+options:
+  bundleIdPrefix: com.timezonecal
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "15.4"
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.10"
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+
+targets:
+  TimezoneCal:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Shared
+      - path: TimezoneCalApp
+    info:
+      path: TimezoneCalApp/Info.plist
+      properties:
+        CFBundleDisplayName: TimezoneCal
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSCalendarsWriteOnlyAccessUsageDescription: "TimezoneCal adds your converted multi-timezone meeting slots directly to your Apple Calendar."
+        NSCalendarsFullAccessUsageDescription: "TimezoneCal adds your converted multi-timezone meeting slots directly to your Apple Calendar."
+    entitlements:
+      path: TimezoneCalApp/TimezoneCal.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.timezonecal.shared
+    dependencies:
+      - target: TimezoneCalWidgets
+        embed: true
+
+  TimezoneCalWidgets:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Shared
+      - path: TimezoneCalWidgets
+    info:
+      path: TimezoneCalWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: TimezoneCal Widgets
+        CFBundleShortVersionString: "1.0.0"
+        CFBundleVersion: "1"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: TimezoneCalWidgets/TimezoneCalWidgets.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.timezonecal.shared
+    settings:
+      base:
+        SKIP_INSTALL: YES

@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TimezoneCal" />
+  <title>TimezoneCal iOS — Interactive iPhone 16 Pro & WidgetKit Simulator</title>
+  <style>
+    :root {
+      --cal-red: #FF3B30;
+      --cal-green: #34C759;
+      --cal-orange: #FF9500;
+      --cal-indigo: #5856D6;
+      --cal-blue: #007AFF;
+      --bg-grouped: #F2F2F7;
+      --bg-card: #FFFFFF;
+      --bg-tertiary: rgba(118, 118, 128, 0.12);
+      --bg-elevated: #EFEFF4;
+      --text-primary: #000000;
+      --text-secondary: #6C6C70;
+      --border-subtle: rgba(60, 60, 67, 0.16);
+      --frosted-bg: rgba(249, 249, 251, 0.86);
+      --page-backdrop: radial-gradient(circle at 20% 10%, #e4e7f1 0%, #cfd5e6 100%);
+    }
+
+    [data-theme="dark"] {
+      --cal-red: #FF453A;
+      --cal-green: #30D158;
+      --cal-orange: #FF9F0A;
+      --cal-indigo: #5E5CE6;
+      --cal-blue: #0A84FF;
+      --bg-grouped: #000000;
+      --bg-card: #1C1C1E;
+      --bg-tertiary: rgba(118, 118, 128, 0.24);
+      --bg-elevated: #2C2C2E;
+      --text-primary: #FFFFFF;
+      --text-secondary: #98989F;
+      --border-subtle: rgba(84, 84, 88, 0.45);
+      --frosted-bg: rgba(28, 28, 30, 0.86);
+      --page-backdrop: radial-gradient(circle at 20% 10%, #1c1f2b 0%, #090a0f 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--page-backdrop);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Desktop Toolbar above Simulator */
+    .simulator-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 14px 0 10px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      font-size: 13px;
+    }
+
+    .simulator-toolbar .badge {
+      background: var(--cal-red);
+      color: #fff;
+      font-weight: 700;
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+
+    .toolbar-btn {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.15s ease;
+    }
+    .toolbar-btn:hover {
+      transform: translateY(-1px);
+    }
+    .toolbar-btn.active {
+      background: var(--cal-red);
+      color: #fff;
+    }
+
+    /* iPhone 16 Pro Frame */
+    .iphone-frame {
+      width: 412px;
+      height: 868px;
+      background: var(--bg-grouped);
+      border-radius: 54px;
+      border: 11px solid #222225;
+      box-shadow:
+        0 0 0 2px #454549,
+        0 28px 70px rgba(0, 0, 0, 0.42);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Responsive Fullscreen on Real iPhone */
+    @media (max-width: 500px) {
+      .simulator-toolbar {
+        display: none;
+      }
+      .iphone-frame {
+        width: 100vw;
+        height: 100dvh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+
+    /* iOS Status Bar + Dynamic Island */
+    .status-bar {
+      height: 46px;
+      padding: 12px 26px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 600;
+      flex-shrink: 0;
+      background: var(--bg-grouped);
+      z-index: 10;
+    }
+
+    .dynamic-island {
+      width: 112px;
+      height: 30px;
+      background: #000;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dynamic-island-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cal-red);
+      margin-right: 6px;
+    }
+    .dynamic-island span {
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    /* Calendar Header */
+    .calendar-header {
+      padding: 6px 16px 8px;
+      background: var(--bg-grouped);
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .header-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .month-trigger {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      text-align: left;
+      color: var(--text-primary);
+    }
+
+    .month-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .month-subtitle {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .now-pill {
+      background: var(--cal-red);
+      color: #fff;
+      border: none;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .circle-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .circle-icon-btn.primary {
+      background: var(--cal-red);
+      color: #fff;
+      font-size: 18px;
+    }
+
+    /* 7-Day Week Strip */
+    .week-strip {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      margin: 4px 0 8px;
+    }
+
+    .week-day-btn {
+      background: none;
+      border: none;
+      padding: 2px 0;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-primary);
+    }
+
+    .week-day-letter {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+    .week-day-btn.selected .week-day-letter {
+      color: var(--cal-red);
+    }
+
+    .week-day-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .week-day-btn.today .week-day-num {
+      color: var(--cal-red);
+      border: 1.5px solid rgba(255, 59, 48, 0.5);
+      font-weight: 700;
+    }
+    .week-day-btn.selected .week-day-num {
+      background: var(--cal-red);
+      color: #fff;
+      font-weight: 800;
+      border: none;
+    }
+
+    /* Expandable Date Picker Box */
+    .date-picker-drawer {
+      background: var(--bg-card);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .date-picker-drawer input[type="date"] {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    /* Preset Group Pills */
+    .group-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .group-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .group-pill {
+      border: none;
+      background: var(--bg-card);
+      color: var(--text-primary);
+      padding: 6px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      cursor: pointer;
+      border: 1px solid var(--border-subtle);
+    }
+    .group-pill.active {
+      background: var(--cal-red);
+      color: #fff;
+      border-color: var(--cal-red);
+    }
+    .group-count {
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 999px;
+      background: rgba(128,128,128,0.2);
+    }
+    .group-pill.active .group-count {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* DST Warning Banner */
+    .dst-banner {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255, 149, 0, 0.15);
+      border: 1px solid rgba(255, 149, 0, 0.45);
+      font-size: 11px;
+      line-height: 1.35;
+      color: var(--text-primary);
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    /* Scrollable Main Content */
+    .main-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 14px 16px;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin: 6px 4px 6px;
+    }
+    .section-action-btn {
+      background: none;
+      border: none;
+      color: var(--cal-red);
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    /* City Card */
+    .city-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 12px 12px 10px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: border-color 0.15s ease, transform 0.12s ease;
+    }
+    .city-card.is-reference {
+      border: 1.8px solid var(--cal-red);
+    }
+
+    .city-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      cursor: pointer;
+      margin-bottom: 9px;
+    }
+
+    .city-title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .city-name {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+
+    .role-badge {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+    }
+    .role-badge.home {
+      background: rgba(0, 122, 255, 0.16);
+      color: var(--cal-blue);
+    }
+    .role-badge.ref {
+      background: var(--cal-red);
+      color: #fff;
+    }
+
+    .city-meta {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .city-meta .day-shift-highlight {
+      color: var(--cal-red);
+      font-weight: 700;
+    }
+
+    .city-time-col {
+      text-align: right;
+    }
+
+    .city-converted-time {
+      font-size: 22px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.5px;
+    }
+    .city-card.is-reference .city-converted-time {
+      color: var(--cal-red);
+    }
+
+    .phase-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      margin-top: 2px;
+    }
+    .phase-working {
+      background: rgba(52, 199, 89, 0.16);
+      color: var(--cal-green);
+    }
+    .phase-morning, .phase-evening {
+      background: rgba(255, 149, 0, 0.16);
+      color: var(--cal-orange);
+    }
+    .phase-sleeping {
+      background: rgba(88, 86, 214, 0.2);
+      color: var(--cal-indigo);
+    }
+
+    /* 24-Hour World Time Buddy Band */
+    .wtb-band {
+      display: grid;
+      grid-template-columns: repeat(24, 1fr);
+      gap: 1.5px;
+      height: 30px;
+      position: relative;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .wtb-cell {
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      cursor: pointer;
+      position: relative;
+    }
+    .wtb-cell.cell-working {
+      background: rgba(52, 199, 89, 0.20);
+      color: var(--text-primary);
+    }
+    .wtb-cell.cell-transition {
+      background: rgba(255, 149, 0, 0.14);
+      color: var(--text-secondary);
+    }
+    .wtb-cell.cell-sleeping {
+      background: rgba(88, 86, 214, 0.16);
+      color: var(--text-secondary);
+    }
+    .wtb-cell.cell-selected {
+      background: var(--cal-red) !important;
+      color: #fff !important;
+      font-weight: 800;
+    }
+
+    .golden-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--cal-green);
+      margin-bottom: 1px;
+    }
+
+    /* Edit Controls inside Card */
+    .card-edit-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px dashed var(--border-subtle);
+    }
+    .mini-edit-btn {
+      border: none;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .mini-edit-btn.danger {
+      background: rgba(255, 59, 48, 0.15);
+      color: var(--cal-red);
+    }
+
+    /* Bottom Frosted Control Bar */
+    .scrubber-dock {
+      background: var(--frosted-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-top: 1px solid var(--border-subtle);
+      padding: 10px 14px 8px;
+      flex-shrink: 0;
+    }
+
+    .golden-bar-btn {
+      width: 100%;
+      background: rgba(52, 199, 89, 0.13);
+      border: 1px solid rgba(52, 199, 89, 0.38);
+      border-radius: 10px;
+      padding: 6px 10px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-primary);
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .golden-jump-pill {
+      background: var(--cal-green);
+      color: #fff;
+      font-weight: 700;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .scrubber-readout-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .scrubber-ref-label {
+      font-size: 9px;
+      font-weight: 800;
+      color: var(--text-secondary);
+      letter-spacing: 0.4px;
+    }
+    .scrubber-ref-time {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--cal-red);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .step-btn-group {
+      display: flex;
+      gap: 4px;
+    }
+    .step-btn {
+      border: none;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 8px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .time-slider {
+      width: 100%;
+      accent-color: var(--cal-red);
+      margin: 4px 0 8px;
+      cursor: pointer;
+    }
+
+    .export-actions-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .action-btn {
+      border: none;
+      border-radius: 11px;
+      padding: 9px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .action-btn.secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+    .action-btn.primary {
+      background: var(--cal-red);
+      color: #fff;
+    }
+
+    /* Bottom iOS Tab Bar */
+    .ios-tab-bar {
+      height: 54px;
+      background: var(--frosted-bg);
+      border-top: 1px solid var(--border-subtle);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      flex-shrink: 0;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      color: var(--cal-red);
+    }
+    .tab-icon {
+      font-size: 17px;
+    }
+
+    /* Widget Studio Cards */
+    .widget-surface {
+      background: var(--bg-card);
+      border-radius: 22px;
+      padding: 14px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      margin-bottom: 16px;
+    }
+    .widget-small-box {
+      width: 175px;
+      height: 175px;
+      margin: 0 auto 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .widget-3col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .widget-mini-col {
+      background: var(--bg-elevated);
+      border-radius: 13px;
+      padding: 9px;
+    }
+    .widget-6h-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .widget-6h-cells {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 3px;
+    }
+    .widget-6h-cell {
+      text-align: center;
+      padding: 5px 2px;
+      border-radius: 5px;
+      font-size: 10px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Modal Overlay */
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      z-index: 50;
+    }
+    .modal-sheet {
+      height: 78%;
+      background: var(--bg-grouped);
+      border-radius: 24px 24px 0 0;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 14px;
+      margin: 10px 0;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: absolute;
+      top: 56px;
+      left: 20px;
+      right: 20px;
+      background: #1c1c1e;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      z-index: 100;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Desktop Simulator Controls -->
+  <div class="simulator-toolbar">
+    <span class="badge">iOS 18 SIMULATOR</span>
+    <strong>TimezoneCal</strong>
+    <button class="toolbar-btn active" id="themeAutoBtn" onclick="setThemeMode('auto')">Auto Day/Night</button>
+    <button class="toolbar-btn" id="themeLightBtn" onclick="setThemeMode('light')">☀️ Light</button>
+    <button class="toolbar-btn" id="themeDarkBtn" onclick="setThemeMode('dark')">🌙 Dark</button>
+    <button class="toolbar-btn" id="formatBtn" onclick="toggle24Hour()">12h / 24h</button>
+  </div>
+
+  <!-- iPhone 16 Pro Enclosure -->
+  <div class="iphone-frame" id="appRoot">
+    <div id="toastBox" class="toast" style="display:none;"></div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span id="statusClock">9:41</span>
+      <div class="dynamic-island">
+        <div class="dynamic-island-dot"></div>
+        <span id="islandLabel">LIVE SYNC</span>
+      </div>
+      <span>5G 🔋</span>
+    </div>
+
+    <!-- TAB 1: CONVERTER VIEW -->
+    <div id="converterTabView" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
+      <!-- Apple Calendar Header -->
+      <div class="calendar-header">
+        <div class="header-top-row">
+          <button class="month-trigger" onclick="toggleDateDrawer()">
+            <div>
+              <div class="month-title">
+                <span style="color:var(--cal-red);">📅</span>
+                <span id="monthYearText">November 2026</span>
+                <span style="color:var(--cal-red); font-size:13px;">▾</span>
+              </div>
+              <div class="month-subtitle" id="selectedDateSubtitle">Sunday, Nov 15 • San Francisco</div>
+            </div>
+          </button>
+
+          <div class="header-actions">
+            <button class="now-pill" id="resetNowBtn" style="display:none;" onclick="resetToNow()">↺ Now</button>
+            <button class="circle-icon-btn" title="Edit / Reorder Cities" onclick="toggleEditMode()" id="editModeBtn">✎</button>
+            <button class="circle-icon-btn primary" title="Add City" onclick="openAddCityModal()">+</button>
+          </div>
+        </div>
+
+        <!-- 7-Day Week Strip -->
+        <div class="week-strip" id="weekStripContainer"></div>
+
+        <!-- Expandable Date Picker & DST Test Shortcut -->
+        <div class="date-picker-drawer" id="datePickerDrawer" style="display:none;">
+          <div>
+            <div style="font-size:11px; font-weight:700;">Jump to Date (Tests DST Shifts):</div>
+            <button class="section-action-btn" onclick="jumpToDSTTestDate()">⚡ Test Jul 15 DST Shift</button>
+          </div>
+          <input type="date" id="calendarDateInput" onchange="onDateInputChanged(this.value)" />
+        </div>
+
+        <!-- Preset Group Pills -->
+        <div class="group-bar" id="groupBarContainer"></div>
+
+        <!-- Smart DST Warning Banner -->
+        <div id="dstWarningContainer"></div>
+      </div>
+
+      <!-- Scrollable City Cards List -->
+      <div class="main-scroll">
+        <div class="section-label">
+          <span>HOME TIMEZONE • TAP ANY CARD TO SET REFERENCE</span>
+          <button class="section-action-btn" onclick="openAddCityModal(true)">Change Home</button>
+        </div>
+        <div id="homeCityCardContainer"></div>
+
+        <div class="section-label">
+          <span id="groupSectionTitle">WORK TEAM CITIES (4)</span>
+          <button class="section-action-btn" onclick="toggleEditMode()" id="reorderLabelBtn">Reorder / Edit</button>
+        </div>
+        <div id="targetCitiesContainer"></div>
+      </div>
+
+      <!-- Frosted Bottom Time Scrubber & Calendar Export -->
+      <div class="scrubber-dock">
+        <div id="goldenHoursContainer"></div>
+
+        <div class="scrubber-readout-row">
+          <div>
+            <div class="scrubber-ref-label" id="scrubberRefTitle">SCRUBBING IN SAN FRANCISCO</div>
+            <div class="scrubber-ref-time" id="scrubberRefTime">9:00 AM</div>
+          </div>
+          <div class="step-btn-group">
+            <button class="step-btn" onclick="shiftMinutes(-60)">-1h</button>
+            <button class="step-btn" onclick="shiftMinutes(-15)">-15m</button>
+            <button class="step-btn" onclick="shiftMinutes(15)">+15m</button>
+            <button class="step-btn" onclick="shiftMinutes(60)">+1h</button>
+          </div>
+        </div>
+
+        <input
+          type="range"
+          min="0"
+          max="1425"
+          step="15"
+          value="540"
+          class="time-slider"
+          id="timeRangeSlider"
+          oninput="onSliderScrub(this.value)"
+        />
+
+        <div class="export-actions-row">
+          <button class="action-btn secondary" onclick="copyShareSnippet()">📤 Share Times</button>
+          <button class="action-btn primary" onclick="exportICSInvite()">📅 Add to Calendar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: WIDGETS STUDIO VIEW -->
+    <div id="widgetsTabView" class="main-scroll" style="display:none;">
+      <div style="margin-bottom:12px;">
+        <div style="font-size:20px; font-weight:800;">iOS WidgetKit Studio</div>
+        <div style="font-size:12px; color:var(--text-secondary);">Live preview of all 4 Home Screen & Lock Screen widgets. Tap cities below to pin/unpin (up to 3):</div>
+      </div>
+
+      <div class="group-bar" id="widgetPinBar" style="margin-bottom:14px;"></div>
+
+      <div class="section-label"><span>1. CALENDAR GLANCE TRIO (SMALL 2×2)</span></div>
+      <div class="widget-surface widget-small-box" id="widgetSmallPreview"></div>
+
+      <div class="section-label"><span>2. MULTI-ZONE OVERLAP CARD (MEDIUM 4×2)</span></div>
+      <div class="widget-surface" id="widgetMediumOverlapPreview"></div>
+
+      <div class="section-label"><span>3. INTERACTIVE 6-HOUR TIMELINE STRIP (MEDIUM 4×2)</span></div>
+      <div class="widget-surface" id="widgetSixHourPreview"></div>
+
+      <div class="section-label"><span>4. LOCK SCREEN WIDGETS (INLINE & RECTANGULAR)</span></div>
+      <div class="widget-surface" id="widgetLockScreenPreview" style="background:linear-gradient(135deg,#2b2a4c,#121218); color:#fff;"></div>
+    </div>
+
+    <!-- Bottom Tab Bar -->
+    <div class="ios-tab-bar">
+      <button class="tab-btn active" id="tabConverterBtn" onclick="switchTab('converter')">
+        <span class="tab-icon">🗓️</span>
+        <span>Converter</span>
+      </button>
+      <button class="tab-btn" id="tabWidgetsBtn" onclick="switchTab('widgets')">
+        <span class="tab-icon">⊞</span>
+        <span>Widgets (4)</span>
+      </button>
+    </div>
+
+    <!-- Add City Search Modal -->
+    <div class="modal-backdrop" id="addCityModal" style="display:none;">
+      <div class="modal-sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong id="modalHeaderTitle" style="font-size:17px;">Add City</strong>
+          <button class="section-action-btn" onclick="closeAddCityModal()" style="font-size:14px;">Done</button>
+        </div>
+        <input
+          type="text"
+          id="citySearchInput"
+          class="search-input"
+          placeholder="Search city, country, or code (e.g. Tokyo, LON, India)..."
+          oninput="renderCityCatalogList()"
+        />
+        <div id="cityCatalogList" style="flex:1; overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Curated Global Catalog matching Shared/Models/CityCatalog.swift
+    const CITY_CATALOG = [
+      { id: "sfo", cityName: "San Francisco", country: "United States", flag: "🇺🇸", tz: "America/Los_Angeles", code: "SFO" },
+      { id: "lax", cityName: "Los Angeles", country: "United States", flag: "🇺🇸", tz: "America/Los_Angeles", code: "LAX" },
+      { id: "sea", cityName: "Seattle", country: "United States", flag: "🇺🇸", tz: "America/Los_Angeles", code: "SEA" },
+      { id: "den", cityName: "Denver", country: "United States", flag: "🇺🇸", tz: "America/Denver", code: "DEN" },
+      { id: "chi", cityName: "Chicago", country: "United States", flag: "🇺🇸", tz: "America/Chicago", code: "CHI" },
+      { id: "aus", cityName: "Austin", country: "United States", flag: "🇺🇸", tz: "America/Chicago", code: "AUS" },
+      { id: "nyc", cityName: "New York", country: "United States", flag: "🇺🇸", tz: "America/New_York", code: "NYC" },
+      { id: "mia", cityName: "Miami", country: "United States", flag: "🇺🇸", tz: "America/New_York", code: "MIA" },
+      { id: "yyz", cityName: "Toronto", country: "Canada", flag: "🇨🇦", tz: "America/Toronto", code: "YYZ" },
+      { id: "yvr", cityName: "Vancouver", country: "Canada", flag: "🇨🇦", tz: "America/Vancouver", code: "YVR" },
+      { id: "mex", cityName: "Mexico City", country: "Mexico", flag: "🇲🇽", tz: "America/Mexico_City", code: "MEX" },
+      { id: "gru", cityName: "São Paulo", country: "Brazil", flag: "🇧🇷", tz: "America/Sao_Paulo", code: "GRU" },
+      { id: "eze", cityName: "Buenos Aires", country: "Argentina", flag: "🇦🇷", tz: "America/Argentina/Buenos_Aires", code: "EZE" },
+      { id: "lon", cityName: "London", country: "United Kingdom", flag: "🇬🇧", tz: "Europe/London", code: "LON" },
+      { id: "dub", cityName: "Dublin", country: "Ireland", flag: "🇮🇪", tz: "Europe/Dublin", code: "DUB" },
+      { id: "lis", cityName: "Lisbon", country: "Portugal", flag: "🇵🇹", tz: "Europe/Lisbon", code: "LIS" },
+      { id: "par", cityName: "Paris", country: "France", flag: "🇫🇷", tz: "Europe/Paris", code: "PAR" },
+      { id: "ber", cityName: "Berlin", country: "Germany", flag: "🇩🇪", tz: "Europe/Berlin", code: "BER" },
+      { id: "ams", cityName: "Amsterdam", country: "Netherlands", flag: "🇳🇱", tz: "Europe/Amsterdam", code: "AMS" },
+      { id: "mad", cityName: "Madrid", country: "Spain", flag: "🇪🇸", tz: "Europe/Madrid", code: "MAD" },
+      { id: "rom", cityName: "Rome", country: "Italy", flag: "🇮🇹", tz: "Europe/Rome", code: "ROM" },
+      { id: "zrh", cityName: "Zurich", country: "Switzerland", flag: "🇨🇭", tz: "Europe/Zurich", code: "ZRH" },
+      { id: "arn", cityName: "Stockholm", country: "Sweden", flag: "🇸🇪", tz: "Europe/Stockholm", code: "ARN" },
+      { id: "ist", cityName: "Istanbul", country: "Turkey", flag: "🇹🇷", tz: "Europe/Istanbul", code: "IST" },
+      { id: "dxb", cityName: "Dubai", country: "UAE", flag: "🇦🇪", tz: "Asia/Dubai", code: "DXB" },
+      { id: "tlv", cityName: "Tel Aviv", country: "Israel", flag: "🇮🇱", tz: "Asia/Jerusalem", code: "TLV" },
+      { id: "jnb", cityName: "Johannesburg", country: "South Africa", flag: "🇿🇦", tz: "Africa/Johannesburg", code: "JNB" },
+      { id: "bom", cityName: "Mumbai", country: "India", flag: "🇮🇳", tz: "Asia/Kolkata", code: "BOM" },
+      { id: "blr", cityName: "Bengaluru", country: "India", flag: "🇮🇳", tz: "Asia/Kolkata", code: "BLR" },
+      { id: "bkk", cityName: "Bangkok", country: "Thailand", flag: "🇹🇭", tz: "Asia/Bangkok", code: "BKK" },
+      { id: "sin", cityName: "Singapore", country: "Singapore", flag: "🇸🇬", tz: "Asia/Singapore", code: "SIN" },
+      { id: "hkg", cityName: "Hong Kong", country: "Hong Kong", flag: "🇭🇰", tz: "Asia/Hong_Kong", code: "HKG" },
+      { id: "tpe", cityName: "Taipei", country: "Taiwan", flag: "🇹🇼", tz: "Asia/Taipei", code: "TPE" },
+      { id: "sha", cityName: "Shanghai", country: "China", flag: "🇨🇳", tz: "Asia/Shanghai", code: "SHA" },
+      { id: "sel", cityName: "Seoul", country: "South Korea", flag: "🇰🇷", tz: "Asia/Seoul", code: "SEL" },
+      { id: "tyo", cityName: "Tokyo", country: "Japan", flag: "🇯🇵", tz: "Asia/Tokyo", code: "TYO" },
+      { id: "syd", cityName: "Sydney", country: "Australia", flag: "🇦🇺", tz: "Australia/Sydney", code: "SYD" },
+      { id: "mel", cityName: "Melbourne", country: "Australia", flag: "🇦🇺", tz: "Australia/Melbourne", code: "MEL" },
+      { id: "akl", cityName: "Auckland", country: "New Zealand", flag: "🇳🇿", tz: "Pacific/Auckland", code: "AKL" }
+    ];
+
+    const state = {
+      homeCity: CITY_CATALOG[0], // San Francisco
+      referenceCityId: "sfo",
+      groups: [
+        { id: "work", name: "Work Team", icon: "💼", cityIds: ["nyc", "lon", "ber", "tyo"] },
+        { id: "family", name: "Family", icon: "🏠", cityIds: ["chi", "yyz", "syd"] },
+        { id: "travel", name: "Travel & APAC", icon: "✈️", cityIds: ["par", "dxb", "sin", "sel"] }
+      ],
+      selectedGroupId: "work",
+      widgetPinnedIds: ["nyc", "lon", "tyo"],
+      selectedTimestamp: Date.now(),
+      isScrubbing: false,
+      use24Hour: false,
+      themeMode: "auto",
+      editMode: false,
+      selectingHomeInModal: false,
+      widgetHourOffset: 0
+    };
+
+    function getCity(id) {
+      return CITY_CATALOG.find(c => c.id === id) || CITY_CATALOG[0];
+    }
+
+    function getActiveGroup() {
+      return state.groups.find(g => g.id === state.selectedGroupId) || state.groups[0];
+    }
+
+    function getActiveCities() {
+      return getActiveGroup().cityIds.map(getCity);
+    }
+
+    function getAllComparedCities() {
+      const active = getActiveCities().filter(c => c.id !== state.homeCity.id);
+      return [state.homeCity, ...active];
+    }
+
+    function getReferenceCity() {
+      if (state.referenceCityId === state.homeCity.id) return state.homeCity;
+      return getActiveCities().find(c => c.id === state.referenceCityId) || state.homeCity;
+    }
+
+    // Extract year, month, day, hour, minute in a target IANA timezone
+    function getLocalParts(timestamp, timeZone) {
+      const d = new Date(timestamp);
+      const fmt = new Intl.DateTimeFormat("en-US", {
+        timeZone,
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        weekday: "short",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: false
+      });
+      const parts = {};
+      fmt.formatToParts(d).forEach(p => { parts[p.type] = p.value; });
+      let h = parseInt(parts.hour, 10);
+      if (h === 24) h = 0;
+      return {
+        year: parseInt(parts.year, 10),
+        month: parseInt(parts.month, 10),
+        day: parseInt(parts.day, 10),
+        weekday: parts.weekday,
+        hour: h,
+        minute: parseInt(parts.minute, 10)
+      };
+    }
+
+    function getTimeZoneOffsetHours(timestamp, timeZone) {
+      const d = new Date(timestamp);
+      const utcDate = new Date(d.toLocaleString("en-US", { timeZone: "UTC" }));
+      const tzDate = new Date(d.toLocaleString("en-US", { timeZone }));
+      return (tzDate - utcDate) / 3600000;
+    }
+
+    function formatTimeInCity(timestamp, city) {
+      const p = getLocalParts(timestamp, city.tz);
+      const mStr = String(p.minute).padStart(2, "0");
+      if (state.use24Hour) {
+        return `${String(p.hour).padStart(2, "0")}:${mStr}`;
+      }
+      const period = p.hour >= 12 ? "PM" : "AM";
+      const h12 = p.hour % 12 === 0 ? 12 : p.hour % 12;
+      return `${h12}:${mStr} ${period}`;
+    }
+
+    function formatCompactHour(hour) {
+      const h = ((hour % 24) + 24) % 24;
+      if (state.use24Hour) return String(h).padStart(2, "0");
+      if (h === 0) return "12a";
+      if (h === 12) return "12p";
+      return h < 12 ? `${h}a` : `${h - 12}p`;
+    }
+
+    function getDayPhase(hour) {
+      const h = ((hour % 24) + 24) % 24;
+      if (h >= 9 && h <= 17) return { label: "Working Hours", icon: "☀️", cls: "phase-working", cellCls: "cell-working" };
+      if (h >= 6 && h <= 8) return { label: "Morning", icon: "🌅", cls: "phase-morning", cellCls: "cell-transition" };
+      if (h >= 18 && h <= 21) return { label: "Evening", icon: "🌆", cls: "phase-evening", cellCls: "cell-transition" };
+      return { label: "Sleeping", icon: "🌙", cls: "phase-sleeping", cellCls: "cell-sleeping" };
+    }
+
+    function getRelativeOffsetBadge(city, refCity, timestamp) {
+      if (city.id === refCity.id) return "REFERENCE";
+      const diff = getTimeZoneOffsetHours(timestamp, city.tz) - getTimeZoneOffsetHours(timestamp, refCity.tz);
+      if (Math.abs(diff) < 0.01) return "SAME TIME";
+      const sign = diff > 0 ? "+" : "";
+      const formatted = Number.isInteger(diff) ? diff : diff.toFixed(1);
+      return `${sign}${formatted} ${Math.abs(diff) === 1 ? "HR" : "HRS"}`;
+    }
+
+    function getRelativeDayLabel(city, refCity, timestamp) {
+      const c = getLocalParts(timestamp, city.tz);
+      const r = getLocalParts(timestamp, refCity.tz);
+      const cUTC = Date.UTC(c.year, c.month - 1, c.day);
+      const rUTC = Date.UTC(r.year, r.month - 1, r.day);
+      const diffDays = Math.round((cUTC - rUTC) / 86400000);
+      if (diffDays < 0) return "Yesterday";
+      if (diffDays > 0) return "Tomorrow";
+      return "Today";
+    }
+
+    // Set time in the active reference city while keeping its selected calendar day
+    function setReferenceCityTime(targetHour, targetMinute) {
+      const refCity = getReferenceCity();
+      const cur = getLocalParts(state.selectedTimestamp, refCity.tz);
+      const deltaMinutes = (targetHour - cur.hour) * 60 + (targetMinute - cur.minute);
+      state.selectedTimestamp += deltaMinutes * 60000;
+      state.isScrubbing = true;
+      renderAll();
+    }
+
+    function shiftMinutes(mins) {
+      state.selectedTimestamp += mins * 60000;
+      state.isScrubbing = true;
+      renderAll();
+    }
+
+    function resetToNow() {
+      state.selectedTimestamp = Date.now();
+      state.isScrubbing = false;
+      state.referenceCityId = state.homeCity.id;
+      state.widgetHourOffset = 0;
+      renderAll();
+    }
+
+    function setReferenceCity(cityId) {
+      state.referenceCityId = cityId;
+      renderAll();
+    }
+
+    // Theme management (Auto Day/Night)
+    function applyTheme() {
+      let effective = state.themeMode;
+      if (effective === "auto") {
+        const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        effective = prefersDark ? "dark" : "light";
+      }
+      document.documentElement.setAttribute("data-theme", effective);
+      document.getElementById("themeAutoBtn").classList.toggle("active", state.themeMode === "auto");
+      document.getElementById("themeLightBtn").classList.toggle("active", state.themeMode === "light");
+      document.getElementById("themeDarkBtn").classList.toggle("active", state.themeMode === "dark");
+    }
+
+    function setThemeMode(mode) {
+      state.themeMode = mode;
+      applyTheme();
+    }
+
+    function toggle24Hour() {
+      state.use24Hour = !state.use24Hour;
+      renderAll();
+    }
+
+    function toggleEditMode() {
+      state.editMode = !state.editMode;
+      renderAll();
+    }
+
+    function toggleDateDrawer() {
+      const drawer = document.getElementById("datePickerDrawer");
+      drawer.style.display = drawer.style.display === "none" ? "flex" : "none";
+    }
+
+    function onDateInputChanged(val) {
+      if (!val) return;
+      const [y, m, d] = val.split("-").map(Number);
+      const refCity = getReferenceCity();
+      const cur = getLocalParts(state.selectedTimestamp, refCity.tz);
+      const curUTC = Date.UTC(cur.year, cur.month - 1, cur.day);
+      const targetUTC = Date.UTC(y, m - 1, d);
+      const dayDelta = Math.round((targetUTC - curUTC) / 86400000);
+      state.selectedTimestamp += dayDelta * 86400000;
+      state.isScrubbing = true;
+      renderAll();
+    }
+
+    function jumpToDSTTestDate() {
+      // Jump to March 18 (when US has entered DST but UK/Europe has not yet shifted!)
+      const ref = getLocalParts(state.selectedTimestamp, getReferenceCity().tz);
+      onDateInputChanged(`${ref.year}-03-18`);
+      showToast("Jumped to March 18 (US/Europe DST transition week)");
+    }
+
+    function renderWeekStrip() {
+      const refCity = getReferenceCity();
+      const cur = getLocalParts(state.selectedTimestamp, refCity.tz);
+      const nowParts = getLocalParts(Date.now(), refCity.tz);
+
+      const selectedDateObj = new Date(Date.UTC(cur.year, cur.month - 1, cur.day));
+      const dayOfWeek = selectedDateObj.getUTCDay(); // 0=Sun
+      const sundayUTC = selectedDateObj.getTime() - dayOfWeek * 86400000;
+
+      const letters = ["S", "M", "T", "W", "T", "F", "S"];
+      const container = document.getElementById("weekStripContainer");
+      container.innerHTML = "";
+
+      for (let i = 0; i < 7; i++) {
+        const dayUTC = new Date(sundayUTC + i * 86400000);
+        const y = dayUTC.getUTCFullYear();
+        const m = dayUTC.getUTCMonth() + 1;
+        const d = dayUTC.getUTCDate();
+
+        const isSelected = (y === cur.year && m === cur.month && d === cur.day);
+        const isToday = (y === nowParts.year && m === nowParts.month && d === nowParts.day);
+
+        const btn = document.createElement("button");
+        btn.className = `week-day-btn ${isSelected ? "selected" : ""} ${isToday ? "today" : ""}`;
+        btn.onclick = () => {
+          const deltaDays = Math.round((Date.UTC(y, m - 1, d) - Date.UTC(cur.year, cur.month - 1, cur.day)) / 86400000);
+          state.selectedTimestamp += deltaDays * 86400000;
+          state.isScrubbing = true;
+          renderAll();
+        };
+        btn.innerHTML = `
+          <span class="week-day-letter">${letters[i]}</span>
+          <span class="week-day-num">${d}</span>
+        `;
+        container.appendChild(btn);
+      }
+    }
+
+    function renderGroupsAndDST() {
+      const groupContainer = document.getElementById("groupBarContainer");
+      groupContainer.innerHTML = "";
+      state.groups.forEach(g => {
+        const btn = document.createElement("button");
+        btn.className = `group-pill ${g.id === state.selectedGroupId ? "active" : ""}`;
+        btn.onclick = () => {
+          state.selectedGroupId = g.id;
+          renderAll();
+        };
+        btn.innerHTML = `<span>${g.icon}</span><span>${g.name}</span><span class="group-count">${g.cityIds.length}</span>`;
+        groupContainer.appendChild(btn);
+      });
+
+      const addGroupBtn = document.createElement("button");
+      addGroupBtn.className = "group-pill";
+      addGroupBtn.innerHTML = "+ New Group";
+      addGroupBtn.onclick = () => {
+        const name = prompt("Enter a name for your new City Preset Group (e.g., Clients, APAC):");
+        if (name && name.trim()) {
+          const id = "grp_" + Date.now();
+          state.groups.push({ id, name: name.trim(), icon: "🌐", cityIds: ["nyc", "lon"] });
+          state.selectedGroupId = id;
+          renderAll();
+        }
+      };
+      groupContainer.appendChild(addGroupBtn);
+
+      // DST Transition Warning Check
+      const refCity = getReferenceCity();
+      const warnings = [];
+      const now = Date.now();
+      getAllComparedCities().forEach(city => {
+        if (city.id === refCity.id) return;
+        const nowDiff = getTimeZoneOffsetHours(now, city.tz) - getTimeZoneOffsetHours(now, refCity.tz);
+        const selDiff = getTimeZoneOffsetHours(state.selectedTimestamp, city.tz) - getTimeZoneOffsetHours(state.selectedTimestamp, refCity.tz);
+        if (Math.abs(selDiff - nowDiff) >= 0.25) {
+          const badgeSel = getRelativeOffsetBadge(city, refCity, state.selectedTimestamp);
+          const badgeNow = getRelativeOffsetBadge(city, refCity, now);
+          warnings.push(`⚠️ <strong>Daylight Saving Shift:</strong> ${city.cityName} is ${badgeSel} on this date (currently ${badgeNow}).`);
+        }
+      });
+
+      const dstBox = document.getElementById("dstWarningContainer");
+      if (warnings.length > 0) {
+        dstBox.innerHTML = `<div class="dst-banner"><div>${warnings.join("<br/>")}</div></div>`;
+      } else {
+        dstBox.innerHTML = "";
+      }
+    }
+
+    function buildCityCardElement(city, isHome) {
+      const refCity = getReferenceCity();
+      const isRef = city.id === refCity.id;
+      const local = getLocalParts(state.selectedTimestamp, city.tz);
+      const refLocal = getLocalParts(state.selectedTimestamp, refCity.tz);
+      const phase = getDayPhase(local.hour);
+      const dayLabel = getRelativeDayLabel(city, refCity, state.selectedTimestamp);
+      const offsetBadge = getRelativeOffsetBadge(city, refCity, state.selectedTimestamp);
+      const allCities = getAllComparedCities();
+
+      const card = document.createElement("div");
+      card.className = `city-card ${isRef ? "is-reference" : ""}`;
+
+      // Build 24h WTB cells mapped to Reference City's 0..23 hours
+      let cellsHTML = "";
+      for (let refH = 0; refH < 24; refH++) {
+        const probeTs = state.selectedTimestamp + (refH - refLocal.hour) * 3600000 - refLocal.minute * 60000;
+        const cityH = getLocalParts(probeTs, city.tz).hour;
+        const cellPhase = getDayPhase(cityH);
+        const isGolden = allCities.length >= 2 && allCities.every(c => {
+          const h = getLocalParts(probeTs, c.tz).hour;
+          return h >= 8 && h <= 17;
+        });
+        const isSelectedCol = (refH === refLocal.hour);
+
+        cellsHTML += `
+          <div class="wtb-cell ${cellPhase.cellCls} ${isSelectedCol ? "cell-selected" : ""}"
+               onclick="setReferenceCityTime(${refH}, 0)">
+            ${isGolden ? '<div class="golden-dot"></div>' : '<div style="height:5px;"></div>'}
+            <span>${cityH}</span>
+          </div>
+        `;
+      }
+
+      let editBarHTML = "";
+      if (state.editMode && !isHome) {
+        const isPinned = state.widgetPinnedIds.includes(city.id);
+        editBarHTML = `
+          <div class="card-edit-bar">
+            <button class="mini-edit-btn" onclick="toggleWidgetPin('${city.id}')">${isPinned ? "📌 Pinned to Widget" : "Pin to Widget"}</button>
+            <button class="mini-edit-btn" onclick="moveCityInGroup('${city.id}', -1)">↑ Up</button>
+            <button class="mini-edit-btn" onclick="moveCityInGroup('${city.id}', 1)">↓ Down</button>
+            <button class="mini-edit-btn danger" onclick="removeCityFromGroup('${city.id}')">🗑 Remove</button>
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="city-card-top" onclick="setReferenceCity('${city.id}')">
+          <div>
+            <div class="city-title-row">
+              <span style="font-size:18px;">${city.flag}</span>
+              <span class="city-name">${city.cityName}</span>
+              ${isHome ? '<span class="role-badge home">HOME</span>' : ''}
+              <span class="role-badge ${isRef ? 'ref' : ''}">${offsetBadge}</span>
+            </div>
+            <div class="city-meta">
+              ${city.country} (${city.code}) • <span class="${dayLabel !== 'Today' ? 'day-shift-highlight' : ''}">${dayLabel}</span>
+            </div>
+          </div>
+          <div class="city-time-col">
+            <div class="city-converted-time">${formatTimeInCity(state.selectedTimestamp, city)}</div>
+            <div class="phase-pill ${phase.cls}">${phase.icon} ${phase.label}</div>
+          </div>
+        </div>
+        <div class="wtb-band">${cellsHTML}</div>
+        ${editBarHTML}
+      `;
+      return card;
+    }
+
+    function renderGoldenHoursAndScrubber() {
+      const refCity = getReferenceCity();
+      const refLocal = getLocalParts(state.selectedTimestamp, refCity.tz);
+      const allCities = getAllComparedCities();
+
+      // Golden Hours calculation across 0..23 in Reference City
+      let bestStart = 9, bestLen = 0, bestCount = 0;
+      const counts = [];
+      for (let h = 0; h < 24; h++) {
+        const probeTs = state.selectedTimestamp + (h - refLocal.hour) * 3600000 - refLocal.minute * 60000;
+        const awakeCount = allCities.filter(c => {
+          const ch = getLocalParts(probeTs, c.tz).hour;
+          return ch >= 8 && ch <= 17;
+        }).length;
+        counts.push(awakeCount);
+      }
+      bestCount = Math.max(...counts);
+      let curStart = null, curLen = 0;
+      for (let h = 0; h < 24; h++) {
+        if (counts[h] === bestCount) {
+          if (curStart === null) { curStart = h; curLen = 1; }
+          else { curLen++; }
+          if (curLen > bestLen) { bestLen = curLen; bestStart = curStart; }
+        } else {
+          curStart = null; curLen = 0;
+        }
+      }
+
+      const goldenBox = document.getElementById("goldenHoursContainer");
+      if (allCities.length >= 2 && bestCount >= 2) {
+        const startLbl = formatCompactHour(bestStart);
+        const endLbl = formatCompactHour(bestStart + Math.max(1, bestLen));
+        goldenBox.innerHTML = `
+          <button class="golden-bar-btn" onclick="setReferenceCityTime(${bestStart}, 0)">
+            <span>✨ <strong>Golden Hours</strong> (${bestCount}/${allCities.length} awake): <strong>${startLbl} – ${endLbl} ${refCity.code}</strong></span>
+            <span class="golden-jump-pill">Jump</span>
+          </button>
+        `;
+      } else {
+        goldenBox.innerHTML = "";
+      }
+
+      document.getElementById("scrubberRefTitle").textContent = `SCRUBBING IN ${refCity.cityName.toUpperCase()}`;
+      document.getElementById("scrubberRefTime").textContent = formatTimeInCity(state.selectedTimestamp, refCity);
+
+      const slider = document.getElementById("timeRangeSlider");
+      slider.value = refLocal.hour * 60 + Math.floor(refLocal.minute / 15) * 15;
+    }
+
+    function onSliderScrub(val) {
+      const totalMins = parseInt(val, 10);
+      const h = Math.floor(totalMins / 60);
+      const m = totalMins % 60;
+      setReferenceCityTime(h, m);
+    }
+
+    function renderWidgetsTab() {
+      const pinBar = document.getElementById("widgetPinBar");
+      pinBar.innerHTML = "";
+      const candidates = [...new Map([...getActiveCities(), ...CITY_CATALOG.slice(0, 8)].map(c => [c.id, c])).values()];
+      candidates.forEach(c => {
+        const isPinned = state.widgetPinnedIds.includes(c.id);
+        const btn = document.createElement("button");
+        btn.className = `group-pill ${isPinned ? "active" : ""}`;
+        btn.onclick = () => toggleWidgetPin(c.id);
+        btn.innerHTML = `${c.flag} ${c.cityName} ${isPinned ? "✓" : ""}`;
+        pinBar.appendChild(btn);
+      });
+
+      const pinned = state.widgetPinnedIds.map(getCity).slice(0, 3);
+      const effectiveTs = state.selectedTimestamp + state.widgetHourOffset * 3600000;
+      const homeDateStr = new Intl.DateTimeFormat("en-US", {
+        timeZone: state.homeCity.tz, weekday: "short", month: "short", day: "numeric"
+      }).format(new Date(effectiveTs)).toUpperCase();
+
+      // 1. Small Calendar Glance Trio
+      document.getElementById("widgetSmallPreview").innerHTML = `
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:10px; font-weight:800; color:var(--cal-red);">${homeDateStr}</span>
+            <span style="font-size:12px;">📅</span>
+          </div>
+          <div style="font-size:13px; font-weight:800; margin-top:2px;">
+            ${state.homeCity.code} ${formatTimeInCity(effectiveTs, state.homeCity)}
+          </div>
+        </div>
+        <hr style="border:none; border-top:1px solid var(--border-subtle); margin:6px 0;" />
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          ${pinned.map(c => {
+            const p = getDayPhase(getLocalParts(effectiveTs, c.tz).hour);
+            return `
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">
+                <strong>${c.code}</strong>
+                <span>${p.icon}</span>
+                <span style="font-weight:700; font-variant-numeric:tabular-nums;">${formatTimeInCity(effectiveTs, c)}</span>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+
+      // 2. Medium Overlap Card
+      document.getElementById("widgetMediumOverlapPreview").innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px;">
+          <div><span style="color:var(--cal-red);">●</span> <strong>${state.homeCity.cityName} (Home)</strong> <span style="color:var(--cal-red); font-weight:800;">${formatTimeInCity(effectiveTs, state.homeCity)}</span></div>
+          <span style="color:var(--text-secondary); font-weight:700;">${homeDateStr}</span>
+        </div>
+        <div class="widget-3col">
+          ${pinned.map(c => {
+            const p = getDayPhase(getLocalParts(effectiveTs, c.tz).hour);
+            return `
+              <div class="widget-mini-col">
+                <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800;">
+                  <span>${c.flag} ${c.code}</span>
+                  <span>${p.icon}</span>
+                </div>
+                <div style="font-size:15px; font-weight:800; margin:5px 0; font-variant-numeric:tabular-nums;">
+                  ${formatTimeInCity(effectiveTs, c)}
+                </div>
+                <div style="font-size:9px; font-weight:700; color:var(--text-secondary);">
+                  ${getRelativeOffsetBadge(c, state.homeCity, effectiveTs)}
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+
+      // 3. Interactive 6-Hour Timeline Strip
+      const offsetLabel = state.widgetHourOffset === 0
+        ? `6-Hour Outlook (${state.homeCity.code})`
+        : `Shifted ${state.widgetHourOffset > 0 ? "+" + state.widgetHourOffset : state.widgetHourOffset}h`;
+
+      document.getElementById("widgetSixHourPreview").innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-size:12px; font-weight:800; color:var(--cal-red);">🗓️ ${offsetLabel}</span>
+          <div style="display:flex; gap:4px;">
+            <button class="step-btn" onclick="shiftWidgetOffset(-1)">-1h</button>
+            <button class="step-btn" style="color:var(--cal-red);" onclick="shiftWidgetOffset(0)">Now</button>
+            <button class="step-btn" onclick="shiftWidgetOffset(1)">+1h</button>
+          </div>
+        </div>
+        ${pinned.map(c => {
+          let slots = "";
+          for (let i = 0; i < 6; i++) {
+            const slotTs = effectiveTs + i * 3600000;
+            const h = getLocalParts(slotTs, c.tz).hour;
+            const isWork = h >= 9 && h <= 17;
+            const bg = i === 0 ? "var(--cal-red)" : (isWork ? "rgba(52,199,89,0.22)" : "rgba(88,86,214,0.18)");
+            const col = i === 0 ? "#fff" : "var(--text-primary)";
+            slots += `<div class="widget-6h-cell" style="background:${bg}; color:${col};">${formatCompactHour(h)}</div>`;
+          }
+          return `
+            <div class="widget-6h-row">
+              <div style="width:54px; font-size:11px; font-weight:800;">${c.flag} ${c.code}</div>
+              <div class="widget-6h-cells">${slots}</div>
+            </div>
+          `;
+        }).join("")}
+      `;
+
+      // 4. Lock Screen Widgets
+      document.getElementById("widgetLockScreenPreview").innerHTML = `
+        <div style="text-align:center; margin-bottom:10px;">
+          <span style="background:rgba(255,255,255,0.14); padding:5px 12px; border-radius:999px; font-size:11px; font-weight:700;">
+            🌐 ${pinned.slice(0,2).map(c => `${c.code} ${formatTimeInCity(effectiveTs, c)} ${getDayPhase(getLocalParts(effectiveTs, c.tz).hour).icon}`).join("  •  ")}
+          </span>
+        </div>
+        <div style="background:rgba(255,255,255,0.12); border-radius:14px; padding:10px 12px; max-width:240px; margin:0 auto;">
+          <div style="font-size:9px; font-weight:800; opacity:0.75; margin-bottom:4px;">WORLD CALENDAR • ${state.homeCity.code}</div>
+          ${pinned.map(c => `
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-top:3px;">
+              <span>${c.cityName}</span>
+              <strong>${getDayPhase(getLocalParts(effectiveTs, c.tz).hour).icon} ${formatTimeInCity(effectiveTs, c)}</strong>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function shiftWidgetOffset(delta) {
+      if (delta === 0) state.widgetHourOffset = 0;
+      else state.widgetHourOffset += delta;
+      renderWidgetsTab();
+    }
+
+    function toggleWidgetPin(cityId) {
+      const idx = state.widgetPinnedIds.indexOf(cityId);
+      if (idx >= 0) {
+        if (state.widgetPinnedIds.length > 1) state.widgetPinnedIds.splice(idx, 1);
+      } else {
+        if (state.widgetPinnedIds.length >= 3) state.widgetPinnedIds.shift();
+        state.widgetPinnedIds.push(cityId);
+      }
+      renderAll();
+    }
+
+    function removeCityFromGroup(cityId) {
+      const g = getActiveGroup();
+      g.cityIds = g.cityIds.filter(id => id !== cityId);
+      if (state.referenceCityId === cityId) state.referenceCityId = state.homeCity.id;
+      renderAll();
+    }
+
+    function moveCityInGroup(cityId, dir) {
+      const g = getActiveGroup();
+      const idx = g.cityIds.indexOf(cityId);
+      const target = idx + dir;
+      if (idx < 0 || target < 0 || target >= g.cityIds.length) return;
+      const tmp = g.cityIds[idx];
+      g.cityIds[idx] = g.cityIds[target];
+      g.cityIds[target] = tmp;
+      renderAll();
+    }
+
+    function openAddCityModal(selectingHome = false) {
+      state.selectingHomeInModal = selectingHome;
+      document.getElementById("modalHeaderTitle").textContent = selectingHome ? "Select Home City" : `Add City to ${getActiveGroup().name}`;
+      document.getElementById("citySearchInput").value = "";
+      document.getElementById("addCityModal").style.display = "flex";
+      renderCityCatalogList();
+    }
+
+    function closeAddCityModal() {
+      document.getElementById("addCityModal").style.display = "none";
+    }
+
+    function renderCityCatalogList() {
+      const q = document.getElementById("citySearchInput").value.trim().toLowerCase();
+      const container = document.getElementById("cityCatalogList");
+      container.innerHTML = "";
+      const activeIds = getActiveGroup().cityIds;
+
+      CITY_CATALOG.filter(c =>
+        !q || c.cityName.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.code.toLowerCase().includes(q)
+      ).forEach(city => {
+        const alreadyInGroup = activeIds.includes(city.id);
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--bg-card); border-radius:12px; margin-bottom:6px; cursor:pointer;";
+        row.onclick = () => {
+          if (state.selectingHomeInModal) {
+            state.homeCity = city;
+            state.referenceCityId = city.id;
+            closeAddCityModal();
+            renderAll();
+          } else if (!alreadyInGroup) {
+            getActiveGroup().cityIds.push(city.id);
+            closeAddCityModal();
+            renderAll();
+          }
+        };
+        row.innerHTML = `
+          <div>
+            <div style="font-weight:700; font-size:14px;">${city.flag} ${city.cityName} <span style="font-size:10px; color:var(--text-secondary);">(${city.code})</span></div>
+            <div style="font-size:11px; color:var(--text-secondary);">${city.country} • ${city.tz}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:700; font-size:13px;">${formatTimeInCity(state.selectedTimestamp, city)}</div>
+            <div style="font-size:10px; color:${alreadyInGroup && !state.selectingHomeInModal ? 'var(--cal-green)' : 'var(--text-secondary)'};">
+              ${alreadyInGroup && !state.selectingHomeInModal ? "Added ✓" : getRelativeOffsetBadge(city, state.homeCity, state.selectedTimestamp)}
+            </div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function buildShareSnippetText() {
+      const refCity = getReferenceCity();
+      const dateStr = new Intl.DateTimeFormat("en-US", {
+        timeZone: refCity.tz, weekday: "short", month: "short", day: "numeric"
+      }).format(new Date(state.selectedTimestamp));
+
+      const lines = [`📅 Proposed Meeting — ${dateStr}`, "────────────────────────────────"];
+      getAllComparedCities().forEach(c => {
+        const start = formatTimeInCity(state.selectedTimestamp, c);
+        const end = formatTimeInCity(state.selectedTimestamp + 3600000, c);
+        const p = getDayPhase(getLocalParts(state.selectedTimestamp, c.tz).hour);
+        const dayShift = getRelativeDayLabel(c, refCity, state.selectedTimestamp);
+        lines.push(`${p.icon} ${c.flag} ${c.cityName} (${c.code}): ${start} – ${end}${dayShift !== "Today" ? " (" + dayShift + ")" : ""}`);
+      });
+      lines.push("────────────────────────────────", "Shared via TimezoneCal");
+      return lines.join("\n");
+    }
+
+    function copyShareSnippet() {
+      const text = buildShareSnippetText();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text);
+      }
+      showToast("📋 Multi-timezone meeting snippet copied to clipboard!");
+    }
+
+    function exportICSInvite() {
+      const start = new Date(state.selectedTimestamp);
+      const end = new Date(state.selectedTimestamp + 3600000);
+      const toICSDate = d => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+      const desc = buildShareSnippetText().replace(/\n/g, "\\n");
+      const ics = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//TimezoneCal iOS//EN",
+        "BEGIN:VEVENT",
+        `DTSTAMP:${toICSDate(new Date())}`,
+        `DTSTART:${toICSDate(start)}`,
+        `DTEND:${toICSDate(end)}`,
+        "SUMMARY:Global Team Sync (TimezoneCal)",
+        `DESCRIPTION:${desc}`,
+        "END:VEVENT",
+        "END:VCALENDAR"
+      ].join("\r\n");
+
+      const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "TimezoneCal-Meeting.ics";
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("📅 Calendar Event (.ics) generated for Apple Calendar!");
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById("toastBox");
+      box.textContent = msg;
+      box.style.display = "block";
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => { box.style.display = "none"; }, 3200);
+    }
+
+    function switchTab(tab) {
+      const isConv = tab === "converter";
+      document.getElementById("converterTabView").style.display = isConv ? "flex" : "none";
+      document.getElementById("widgetsTabView").style.display = isConv ? "none" : "block";
+      document.getElementById("tabConverterBtn").classList.toggle("active", isConv);
+      document.getElementById("tabWidgetsBtn").classList.toggle("active", !isConv);
+      renderAll();
+    }
+
+    function renderAll() {
+      applyTheme();
+      const refCity = getReferenceCity();
+      const d = new Date(state.selectedTimestamp);
+
+      document.getElementById("monthYearText").textContent = new Intl.DateTimeFormat("en-US", {
+        timeZone: refCity.tz, month: "long", year: "numeric"
+      }).format(d);
+
+      const subDate = new Intl.DateTimeFormat("en-US", {
+        timeZone: refCity.tz, weekday: "long", month: "short", day: "numeric"
+      }).format(d);
+      document.getElementById("selectedDateSubtitle").textContent = `${subDate} • ${refCity.cityName}`;
+
+      const showNow = state.isScrubbing || state.referenceCityId !== state.homeCity.id;
+      document.getElementById("resetNowBtn").style.display = showNow ? "inline-block" : "none";
+      document.getElementById("islandLabel").textContent = showNow ? "SCRUBBING" : "LIVE SYNC";
+      document.getElementById("reorderLabelBtn").textContent = state.editMode ? "Done" : "Reorder / Edit";
+
+      renderWeekStrip();
+      renderGroupsAndDST();
+
+      // Home Card
+      const homeContainer = document.getElementById("homeCityCardContainer");
+      homeContainer.innerHTML = "";
+      homeContainer.appendChild(buildCityCardElement(state.homeCity, true));
+
+      // Target Group Cards
+      const activeGroup = getActiveGroup();
+      document.getElementById("groupSectionTitle").textContent = `${activeGroup.name.toUpperCase()} CITIES (${activeGroup.cityIds.length})`;
+      const targetContainer = document.getElementById("targetCitiesContainer");
+      targetContainer.innerHTML = "";
+      getActiveCities().forEach(c => {
+        targetContainer.appendChild(buildCityCardElement(c, false));
+      });
+
+      renderGoldenHoursAndScrubber();
+      renderWidgetsTab();
+    }
+
+    // Initialize
+    renderAll();
+  </script>
+</body>
+</html>
