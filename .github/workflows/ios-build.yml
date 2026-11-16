@@ -8,7 +8,7 @@ on:
 jobs:
   build-unsigned-ipa:
     name: Compile iOS App + WidgetKit Extension (macOS Runner)
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Checkout Repository
