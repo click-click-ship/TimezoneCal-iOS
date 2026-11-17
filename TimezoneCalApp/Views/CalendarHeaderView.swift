@@ -1,12 +1,13 @@
 import SwiftUI
 
 /// Authentic iOS Calendar-styled top header with expandable Month Picker, 7-Day Week Strip,
-/// Group Preset Switcher, and Smart Daylight Saving Time (DST) Warning Banner.
+/// Group Preset Switcher, Edit toggle, and Smart Daylight Saving Time (DST) Warning Banner.
 public struct CalendarHeaderView: View {
     @EnvironmentObject private var store: TimezoneStore
 
-    @Binding var showAddCitySheet: Bool
+    @Binding var activeCitySheetMode: AddCitySheetView.SelectionMode?
     @Binding var showManageGroupsSheet: Bool
+    @Binding var editMode: EditMode
     @State private var isMonthCalendarExpanded: Bool = false
 
     private var referenceCalendar: Calendar {
@@ -42,9 +43,9 @@ public struct CalendarHeaderView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 10) {
-            // MARK: Top Bar — Month/Year Dropdown, Appearance Toggle & "Today/Now" Button
-            HStack(alignment: .center, spacing: 12) {
+        VStack(spacing: 6) {
+            // MARK: Top Bar — Month/Year Dropdown, Appearance Toggle, Edit Button & Add City (+)
+            HStack(alignment: .center, spacing: 8) {
                 Button {
                     withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
                         isMonthCalendarExpanded.toggle()
@@ -52,17 +53,17 @@ public struct CalendarHeaderView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "calendar")
-                            .font(.system(size: 18, weight: .semibold))
+                            .font(.system(size: 17, weight: .semibold))
                             .foregroundStyle(.red)
 
-                        VStack(alignment: .leading, spacing: 1) {
+                        VStack(alignment: .leading, spacing: 0) {
                             HStack(spacing: 4) {
                                 Text(monthYearTitle)
-                                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                                    .font(.system(size: 18, weight: .bold, design: .rounded))
                                     .foregroundStyle(.primary)
 
                                 Image(systemName: isMonthCalendarExpanded ? "chevron.up.circle.fill" : "chevron.down.circle.fill")
-                                    .font(.system(size: 14, weight: .semibold))
+                                    .font(.system(size: 13, weight: .semibold))
                                     .foregroundStyle(.red)
                             }
                             Text(fullSelectedDateSubtitle)
@@ -75,26 +76,7 @@ public struct CalendarHeaderView: View {
 
                 Spacer()
 
-                // Reset to Live "Now" button (highlighted in Calendar Red when scrubbed)
-                if store.isScrubbingCustomTime || store.activeReferenceCityID != store.homeCity.id {
-                    Button {
-                        store.resetToNow()
-                    } label: {
-                        HStack(spacing: 4) {
-                            Image(systemName: "clock.arrow.circlepath")
-                                .font(.caption.weight(.bold))
-                            Text("Now")
-                                .font(.caption.weight(.bold))
-                        }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(Color.red, in: Capsule())
-                        .foregroundStyle(.white)
-                    }
-                    .transition(.scale.combined(with: .opacity))
-                }
-
-                // Auto Day / Night Mode Menu
+                // Auto Day / Night Mode & Format Menu
                 Menu {
                     Section("Appearance (Auto Day/Night)") {
                         ForEach(AppearanceMode.allCases, id: \.self) { mode in
@@ -120,25 +102,43 @@ public struct CalendarHeaderView: View {
                     }
                 } label: {
                     Image(systemName: store.appearanceMode.symbolName)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(.primary)
-                        .frame(width: 34, height: 34)
+                        .frame(width: 32, height: 32)
                         .background(Color(.tertiarySystemFill), in: Circle())
                 }
 
+                // Edit / Reorder Cities Button (Top-Right Corner)
+                Button {
+                    withAnimation(.snappy) {
+                        editMode = (editMode == .active) ? .inactive : .active
+                    }
+                } label: {
+                    Image(systemName: editMode == .active ? "checkmark" : "pencil")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(editMode == .active ? .white : .primary)
+                        .frame(width: 32, height: 32)
+                        .background(
+                            editMode == .active ? Color.red : Color(.tertiarySystemFill),
+                            in: Circle()
+                        )
+                }
+                .accessibilityLabel(editMode == .active ? "Done Editing" : "Edit Cities")
+
                 // Add City Quick Action
                 Button {
-                    showAddCitySheet = true
+                    activeCitySheetMode = .addToGroup
                 } label: {
                     Image(systemName: "plus")
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.system(size: 15, weight: .bold))
                         .foregroundStyle(.white)
-                        .frame(width: 34, height: 34)
+                        .frame(width: 32, height: 32)
                         .background(Color.red, in: Circle())
                 }
+                .accessibilityLabel("Add City")
             }
             .padding(.horizontal, 16)
-            .padding(.top, 8)
+            .padding(.top, 4)
 
             // MARK: Apple Calendar 7-Day Week Strip
             HStack(spacing: 0) {
@@ -151,24 +151,24 @@ public struct CalendarHeaderView: View {
                             store.selectCalendarDay(day)
                         }
                     } label: {
-                        VStack(spacing: 5) {
+                        VStack(spacing: 3) {
                             Text(shortWeekdaySymbol(for: day))
-                                .font(.system(size: 11, weight: .semibold))
+                                .font(.system(size: 10, weight: .semibold))
                                 .foregroundStyle(isSelected ? .red : .secondary)
 
                             ZStack {
                                 if isSelected {
                                     Circle()
                                         .fill(isToday ? Color.red : Color.primary)
-                                        .frame(width: 34, height: 34)
+                                        .frame(width: 28, height: 28)
                                 } else if isToday {
                                     Circle()
                                         .strokeBorder(Color.red.opacity(0.55), lineWidth: 1.5)
-                                        .frame(width: 34, height: 34)
+                                        .frame(width: 28, height: 28)
                                 }
 
                                 Text("\(referenceCalendar.component(.day, from: day))")
-                                    .font(.system(size: 15, weight: isSelected || isToday ? .bold : .medium, design: .rounded))
+                                    .font(.system(size: 14, weight: isSelected || isToday ? .bold : .medium, design: .rounded))
                                     .foregroundStyle(
                                         isSelected
                                             ? Color(.systemBackground)
@@ -177,7 +177,7 @@ public struct CalendarHeaderView: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4)
+                        .padding(.vertical, 2)
                     }
                     .buttonStyle(.plain)
                 }
@@ -208,7 +208,7 @@ public struct CalendarHeaderView: View {
 
             // MARK: City Group / Preset Pill Bar ("Work Team", "Family", "Travel")
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
+                HStack(spacing: 7) {
                     ForEach(store.groups) { group in
                         let isSelected = group.id == store.selectedGroupID
                         Button {
@@ -216,22 +216,22 @@ public struct CalendarHeaderView: View {
                                 store.selectedGroupID = group.id
                             }
                         } label: {
-                            HStack(spacing: 6) {
+                            HStack(spacing: 5) {
                                 Image(systemName: group.iconName)
-                                    .font(.system(size: 12, weight: .semibold))
+                                    .font(.system(size: 11, weight: .semibold))
                                 Text(group.name)
-                                    .font(.system(size: 13, weight: .semibold))
+                                    .font(.system(size: 12, weight: .semibold))
                                 Text("\(group.cities.count)")
-                                    .font(.system(size: 11, weight: .bold, design: .rounded))
-                                    .padding(.horizontal, 6)
+                                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                                    .padding(.horizontal, 5)
                                     .padding(.vertical, 1)
                                     .background(
                                         isSelected ? Color.white.opacity(0.24) : Color(.tertiarySystemFill),
                                         in: Capsule()
                                     )
                             }
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 7)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
                             .background(
                                 isSelected ? Color.red : Color(.secondarySystemGroupedBackground),
                                 in: Capsule()
@@ -246,12 +246,12 @@ public struct CalendarHeaderView: View {
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: "slider.horizontal.3")
-                                .font(.system(size: 12, weight: .semibold))
+                                .font(.system(size: 11, weight: .semibold))
                             Text("Groups")
-                                .font(.system(size: 13, weight: .medium))
+                                .font(.system(size: 12, weight: .medium))
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 7)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
                         .background(Color(.tertiarySystemFill), in: Capsule())
                         .foregroundStyle(.secondary)
                     }
@@ -276,7 +276,7 @@ public struct CalendarHeaderView: View {
                         }
                     }
                 }
-                .padding(10)
+                .padding(8)
                 .background(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .fill(Color.orange.opacity(0.15))

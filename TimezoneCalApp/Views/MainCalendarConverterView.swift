@@ -1,10 +1,10 @@
 import SwiftUI
 
-/// Main TabView coordinating the Apple Calendar Timezone Converter and the Interactive Widget Studio.
+/// Main TabView coordinating the Apple Calendar Timezone Converter, Share Times, and the Interactive Widget Studio.
 public struct MainCalendarConverterView: View {
     @EnvironmentObject private var store: TimezoneStore
 
-    @State private var showAddCitySheet: Bool = false
+    @State private var activeCitySheetMode: AddCitySheetView.SelectionMode?
     @State private var showManageGroupsSheet: Bool = false
     @State private var editMode: EditMode = .inactive
 
@@ -18,15 +18,21 @@ public struct MainCalendarConverterView: View {
                     Label("Converter", systemImage: "calendar.day.timeline.left")
                 }
 
-            // MARK: Tab 2 — Interactive WidgetKit Studio & Configurator
+            // MARK: Tab 2 (Middle) — Share Times
+            ShareTimesView()
+                .tabItem {
+                    Label("Share Times", systemImage: "square.and.arrow.up")
+                }
+
+            // MARK: Tab 3 — Interactive WidgetKit Studio & Configurator
             WidgetGalleryPreviewView()
                 .tabItem {
                     Label("Widgets", systemImage: "square.grid.2x2.fill")
                 }
         }
         .tint(.red)
-        .sheet(isPresented: $showAddCitySheet) {
-            AddCitySheetView()
+        .sheet(item: $activeCitySheetMode) { mode in
+            AddCitySheetView(initialMode: mode)
         }
         .sheet(isPresented: $showManageGroupsSheet) {
             ManageGroupsSheetView()
@@ -35,35 +41,19 @@ public struct MainCalendarConverterView: View {
 
     private var converterTab: some View {
         VStack(spacing: 0) {
-            // Top Apple Calendar Header + Week Scrubber + Group Bar
+            // Top Apple Calendar Header + Week Scrubber + Group Bar + Top-Right Edit & Add Buttons
             CalendarHeaderView(
-                showAddCitySheet: $showAddCitySheet,
-                showManageGroupsSheet: $showManageGroupsSheet
+                activeCitySheetMode: $activeCitySheetMode,
+                showManageGroupsSheet: $showManageGroupsSheet,
+                editMode: $editMode
             )
 
-            // Scrollable / Editable List of Cities
+            // Dynamic Editable List of Target Cities (Home section removed for maximum card visibility)
             List {
-                // Section 1: Pinned Home Timezone Card
-                Section {
-                    CityRowCardView(city: store.homeCity, isHomeCity: true)
-                        .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-                        .listRowBackground(Color.clear)
-                        .listRowSeparator(.hidden)
-                } header: {
-                    HStack {
-                        Text("HOME TIMEZONE • TAP ANY CARD TO SET AS REFERENCE")
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                    }
-                    .padding(.horizontal, 4)
-                }
-
-                // Section 2: Dynamic Editable List of Target Cities
                 Section {
                     ForEach(store.activeCities) { city in
-                        CityRowCardView(city: city, isHomeCity: false)
-                            .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                        CityRowCardView(city: city, isHomeCity: city.id == store.homeCity.id)
+                            .listRowInsets(EdgeInsets(top: 4, leading: 14, bottom: 4, trailing: 14))
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -88,23 +78,25 @@ public struct MainCalendarConverterView: View {
                     .onMove(perform: store.moveCities)
                 } header: {
                     HStack {
-                        Text("\(store.activeGroup.name.uppercased()) CITIES (\(store.activeCities.count))")
-                            .font(.system(size: 11, weight: .semibold))
+                        Text("\(store.activeGroup.name.uppercased()) (\(store.activeCities.count)) • TAP CARD FOR REF")
+                            .font(.system(size: 10.5, weight: .semibold))
                             .foregroundStyle(.secondary)
 
                         Spacer()
 
-                        Button {
-                            withAnimation {
-                                editMode = (editMode == .active) ? .inactive : .active
+                        if editMode == .active {
+                            Button {
+                                withAnimation(.snappy) {
+                                    editMode = .inactive
+                                }
+                            } label: {
+                                Text("Done")
+                                    .font(.system(size: 11.5, weight: .bold))
+                                    .foregroundStyle(.red)
                             }
-                        } label: {
-                            Text(editMode == .active ? "Done" : "Reorder / Edit")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(.red)
                         }
                     }
-                    .padding(.horizontal, 4)
+                    .padding(.horizontal, 2)
                 }
             }
             .listStyle(.plain)
@@ -112,8 +104,8 @@ public struct MainCalendarConverterView: View {
             .background(Color(.systemGroupedBackground))
             .environment(\.editMode, $editMode)
 
-            // Bottom Frosted-Glass Time Scrubber & Calendar Export Bar
-            TimeScrubberControlView()
+            // Bottom Frosted-Glass Time Scrubber, Tappable Home Selector & Reset to Now Bar
+            TimeScrubberControlView(activeCitySheetMode: $activeCitySheetMode)
         }
         .background(Color(.systemGroupedBackground))
     }

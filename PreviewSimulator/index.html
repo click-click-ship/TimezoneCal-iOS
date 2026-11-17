@@ -172,7 +172,7 @@
 
     /* Calendar Header */
     .calendar-header {
-      padding: 6px 16px 8px;
+      padding: 4px 14px 6px;
       background: var(--bg-grouped);
       border-bottom: 1px solid var(--border-subtle);
       flex-shrink: 0;
@@ -182,7 +182,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 5px;
     }
 
     .month-trigger {
@@ -198,7 +198,7 @@
     }
 
     .month-title {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 800;
       letter-spacing: -0.3px;
       display: flex;
@@ -216,17 +216,6 @@
       display: flex;
       align-items: center;
       gap: 6px;
-    }
-
-    .now-pill {
-      background: var(--cal-red);
-      color: #fff;
-      border: none;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 5px 10px;
-      border-radius: 999px;
-      cursor: pointer;
     }
 
     .circle-icon-btn {
@@ -254,18 +243,18 @@
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       text-align: center;
-      margin: 4px 0 8px;
+      margin: 2px 0 6px;
     }
 
     .week-day-btn {
       background: none;
       border: none;
-      padding: 2px 0;
+      padding: 1px 0;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       color: var(--text-primary);
     }
 
@@ -279,13 +268,13 @@
     }
 
     .week-day-num {
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
     }
     .week-day-btn.today .week-day-num {
@@ -383,7 +372,7 @@
     .main-scroll {
       flex: 1;
       overflow-y: auto;
-      padding: 10px 14px 16px;
+      padding: 6px 14px 10px;
     }
 
     .section-label {
@@ -392,9 +381,9 @@
       justify-content: space-between;
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
       color: var(--text-secondary);
-      margin: 6px 4px 6px;
+      margin: 2px 4px 5px;
     }
     .section-action-btn {
       background: none;
@@ -406,14 +395,14 @@
       padding: 0;
     }
 
-    /* City Card */
+    /* Compact City Card (fits 3-4 cards before scroll) */
     .city-card {
       background: var(--bg-card);
-      border-radius: 16px;
-      padding: 12px 12px 10px;
-      margin-bottom: 10px;
+      border-radius: 14px;
+      padding: 8px 11px 7px;
+      margin-bottom: 7px;
       border: 1px solid var(--border-subtle);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.03);
       transition: border-color 0.15s ease, transform 0.12s ease;
     }
     .city-card.is-reference {
@@ -423,20 +412,20 @@
     .city-card-top {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       cursor: pointer;
-      margin-bottom: 9px;
+      margin-bottom: 5px;
     }
 
     .city-title-row {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       flex-wrap: wrap;
     }
 
     .city-name {
-      font-size: 17px;
+      font-size: 15.5px;
       font-weight: 700;
       letter-spacing: -0.2px;
     }
@@ -444,7 +433,7 @@
     .role-badge {
       font-size: 9px;
       font-weight: 800;
-      padding: 2px 6px;
+      padding: 1.5px 6px;
       border-radius: 999px;
       background: var(--bg-tertiary);
       color: var(--text-secondary);
@@ -459,9 +448,9 @@
     }
 
     .city-meta {
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--text-secondary);
-      margin-top: 2px;
+      margin-top: 1px;
     }
     .city-meta .day-shift-highlight {
       color: var(--cal-red);
@@ -473,10 +462,11 @@
     }
 
     .city-converted-time {
-      font-size: 22px;
+      font-size: 19px;
       font-weight: 800;
       font-variant-numeric: tabular-nums;
       letter-spacing: -0.5px;
+      line-height: 1.1;
     }
     .city-card.is-reference .city-converted-time {
       color: var(--cal-red);
@@ -485,10 +475,10 @@
     .phase-pill {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      font-size: 10px;
+      gap: 3px;
+      font-size: 9.5px;
       font-weight: 700;
-      padding: 2px 7px;
+      padding: 1.5px 6px;
       border-radius: 999px;
       margin-top: 2px;
     }
@@ -510,19 +500,19 @@
       display: grid;
       grid-template-columns: repeat(24, 1fr);
       gap: 1.5px;
-      height: 30px;
+      height: 22px;
       position: relative;
       user-select: none;
       touch-action: none;
     }
 
     .wtb-cell {
-      border-radius: 4px;
+      border-radius: 3.5px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 9px;
+      font-size: 8.5px;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
       cursor: pointer;
@@ -584,7 +574,7 @@
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border-top: 1px solid var(--border-subtle);
-      padding: 10px 14px 8px;
+      padding: 7px 14px 7px;
       flex-shrink: 0;
     }
 
@@ -593,8 +583,8 @@
       background: rgba(52, 199, 89, 0.13);
       border: 1px solid rgba(52, 199, 89, 0.38);
       border-radius: 10px;
-      padding: 6px 10px;
-      margin-bottom: 8px;
+      padding: 5px 10px;
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -615,32 +605,47 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
-    .scrubber-ref-label {
-      font-size: 9px;
+    .home-selector-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 122, 255, 0.14);
+      border: 1px solid rgba(0, 122, 255, 0.35);
+      color: var(--cal-blue);
+      font-size: 10px;
       font-weight: 800;
-      color: var(--text-secondary);
-      letter-spacing: 0.4px;
+      letter-spacing: 0.3px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .ref-indicator-text {
+      font-size: 9.5px;
+      font-weight: 800;
+      color: var(--cal-red);
+      margin-left: 5px;
     }
     .scrubber-ref-time {
       font-size: 18px;
       font-weight: 800;
       color: var(--cal-red);
       font-variant-numeric: tabular-nums;
+      margin-top: 2px;
     }
 
     .step-btn-group {
       display: flex;
-      gap: 4px;
+      gap: 5px;
     }
     .step-btn {
       border: none;
       background: var(--bg-tertiary);
       color: var(--text-primary);
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 700;
-      padding: 5px 8px;
+      padding: 6px 11px;
       border-radius: 999px;
       cursor: pointer;
     }
@@ -648,19 +653,19 @@
     .time-slider {
       width: 100%;
       accent-color: var(--cal-red);
-      margin: 4px 0 8px;
+      margin: 2px 0 6px;
       cursor: pointer;
     }
 
     .export-actions-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
       gap: 8px;
     }
     .action-btn {
+      width: 100%;
       border: none;
-      border-radius: 11px;
-      padding: 9px 10px;
+      border-radius: 10px;
+      padding: 8px 10px;
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
@@ -678,13 +683,13 @@
       color: #fff;
     }
 
-    /* Bottom iOS Tab Bar */
+    /* Bottom iOS Tab Bar (3 tabs: Converter, Share Times, Widgets) */
     .ios-tab-bar {
-      height: 54px;
+      height: 52px;
       background: var(--frosted-bg);
       border-top: 1px solid var(--border-subtle);
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       flex-shrink: 0;
     }
     .tab-btn {
@@ -846,9 +851,8 @@
           </button>
 
           <div class="header-actions">
-            <button class="now-pill" id="resetNowBtn" style="display:none;" onclick="resetToNow()">↺ Now</button>
             <button class="circle-icon-btn" title="Edit / Reorder Cities" onclick="toggleEditMode()" id="editModeBtn">✎</button>
-            <button class="circle-icon-btn primary" title="Add City" onclick="openAddCityModal()">+</button>
+            <button class="circle-icon-btn primary" title="Add City" onclick="openAddCityModal(false)">+</button>
           </div>
         </div>
 
@@ -859,7 +863,7 @@
         <div class="date-picker-drawer" id="datePickerDrawer" style="display:none;">
           <div>
             <div style="font-size:11px; font-weight:700;">Jump to Date (Tests DST Shifts):</div>
-            <button class="section-action-btn" onclick="jumpToDSTTestDate()">⚡ Test Jul 15 DST Shift</button>
+            <button class="section-action-btn" onclick="jumpToDSTTestDate()">⚡ Test Mar 18 DST Shift</button>
           </div>
           <input type="date" id="calendarDateInput" onchange="onDateInputChanged(this.value)" />
         </div>
@@ -871,34 +875,33 @@
         <div id="dstWarningContainer"></div>
       </div>
 
-      <!-- Scrollable City Cards List -->
+      <!-- Scrollable City Cards List (Home Timezone section removed for maximum card density) -->
       <div class="main-scroll">
         <div class="section-label">
-          <span>HOME TIMEZONE • TAP ANY CARD TO SET REFERENCE</span>
-          <button class="section-action-btn" onclick="openAddCityModal(true)">Change Home</button>
-        </div>
-        <div id="homeCityCardContainer"></div>
-
-        <div class="section-label">
-          <span id="groupSectionTitle">WORK TEAM CITIES (4)</span>
-          <button class="section-action-btn" onclick="toggleEditMode()" id="reorderLabelBtn">Reorder / Edit</button>
+          <span id="groupSectionTitle">WORK TEAM (4) • TAP CARD FOR REF</span>
+          <button class="section-action-btn" onclick="toggleEditMode()" id="reorderLabelBtn"></button>
         </div>
         <div id="targetCitiesContainer"></div>
       </div>
 
-      <!-- Frosted Bottom Time Scrubber & Calendar Export -->
+      <!-- Frosted Bottom Time Scrubber, Home Selector & Reset to Now -->
       <div class="scrubber-dock">
         <div id="goldenHoursContainer"></div>
 
         <div class="scrubber-readout-row">
           <div>
-            <div class="scrubber-ref-label" id="scrubberRefTitle">SCRUBBING IN SAN FRANCISCO</div>
+            <div style="display:flex; align-items:center; flex-wrap:wrap;">
+              <button class="home-selector-pill" onclick="openAddCityModal(true)" title="Change Home City">
+                <span>🏠</span>
+                <span id="homePillLabel">HOME: SAN FRANCISCO</span>
+                <span>▾</span>
+              </button>
+              <span class="ref-indicator-text" id="refIndicatorLabel" style="display:none;"></span>
+            </div>
             <div class="scrubber-ref-time" id="scrubberRefTime">9:00 AM</div>
           </div>
           <div class="step-btn-group">
             <button class="step-btn" onclick="shiftMinutes(-60)">-1h</button>
-            <button class="step-btn" onclick="shiftMinutes(-15)">-15m</button>
-            <button class="step-btn" onclick="shiftMinutes(15)">+15m</button>
             <button class="step-btn" onclick="shiftMinutes(60)">+1h</button>
           </div>
         </div>
@@ -915,13 +918,33 @@
         />
 
         <div class="export-actions-row">
-          <button class="action-btn secondary" onclick="copyShareSnippet()">📤 Share Times</button>
-          <button class="action-btn primary" onclick="exportICSInvite()">📅 Add to Calendar</button>
+          <button class="action-btn secondary" id="resetToNowActionBtn" onclick="resetToNow()">↺ Reset to Now</button>
         </div>
       </div>
     </div>
 
-    <!-- TAB 2: WIDGETS STUDIO VIEW -->
+    <!-- TAB 2 (MIDDLE): SHARE TIMES VIEW -->
+    <div id="shareTabView" class="main-scroll" style="display:none;">
+      <div style="margin-bottom:12px;">
+        <div style="font-size:20px; font-weight:800;">Share Times</div>
+        <div style="font-size:12px; color:var(--text-secondary);">Copy or share your multi-timezone meeting availability.</div>
+      </div>
+
+      <div class="widget-surface" style="margin-bottom:12px;">
+        <div style="font-size:11px; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">MEETING TITLE & DURATION</div>
+        <input type="text" id="shareMeetingTitleInput" class="search-input" style="margin:0 0 8px;" value="Proposed Meeting" oninput="renderShareTab()" />
+        <div class="group-bar" id="shareDurationPills"></div>
+      </div>
+
+      <div class="section-label"><span>LIVE SNIPPET PREVIEW</span></div>
+      <div class="widget-surface" style="margin-bottom:12px;">
+        <pre id="shareSnippetPreviewBox" style="margin:0; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11.5px; white-space:pre-wrap; line-height:1.45;"></pre>
+      </div>
+
+      <button class="action-btn primary" style="margin-bottom:8px;" onclick="copyShareSnippet()">📤 Copy / Share Times</button>
+    </div>
+
+    <!-- TAB 3: WIDGETS STUDIO VIEW -->
     <div id="widgetsTabView" class="main-scroll" style="display:none;">
       <div style="margin-bottom:12px;">
         <div style="font-size:20px; font-weight:800;">iOS WidgetKit Studio</div>
@@ -943,11 +966,15 @@
       <div class="widget-surface" id="widgetLockScreenPreview" style="background:linear-gradient(135deg,#2b2a4c,#121218); color:#fff;"></div>
     </div>
 
-    <!-- Bottom Tab Bar -->
+    <!-- Bottom Tab Bar (3 tabs: Converter, Share Times in middle, Widgets) -->
     <div class="ios-tab-bar">
       <button class="tab-btn active" id="tabConverterBtn" onclick="switchTab('converter')">
         <span class="tab-icon">🗓️</span>
         <span>Converter</span>
+      </button>
+      <button class="tab-btn" id="tabShareBtn" onclick="switchTab('share')">
+        <span class="tab-icon">📤</span>
+        <span>Share Times</span>
       </button>
       <button class="tab-btn" id="tabWidgetsBtn" onclick="switchTab('widgets')">
         <span class="tab-icon">⊞</span>
@@ -955,12 +982,16 @@
       </button>
     </div>
 
-    <!-- Add City Search Modal -->
+    <!-- Add City / Change Home Search Modal -->
     <div class="modal-backdrop" id="addCityModal" style="display:none;">
       <div class="modal-sheet">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <strong id="modalHeaderTitle" style="font-size:17px;">Add City</strong>
           <button class="section-action-btn" onclick="closeAddCityModal()" style="font-size:14px;">Done</button>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:8px; background:var(--bg-tertiary); padding:3px; border-radius:10px;">
+          <button id="modalModeAddBtn" class="toolbar-btn" style="border-radius:8px;" onclick="setModalHomeMode(false)">Add to List</button>
+          <button id="modalModeHomeBtn" class="toolbar-btn" style="border-radius:8px;" onclick="setModalHomeMode(true)">Change Home City</button>
         </div>
         <input
           type="text"
@@ -1034,7 +1065,8 @@
       themeMode: "auto",
       editMode: false,
       selectingHomeInModal: false,
-      widgetHourOffset: 0
+      widgetHourOffset: 0,
+      shareDurationMinutes: 60
     };
 
     function getCity(id) {
@@ -1424,8 +1456,19 @@
         goldenBox.innerHTML = "";
       }
 
-      document.getElementById("scrubberRefTitle").textContent = `SCRUBBING IN ${refCity.cityName.toUpperCase()}`;
+      document.getElementById("homePillLabel").textContent = `HOME: ${state.homeCity.cityName.toUpperCase()}`;
+      const refIndicator = document.getElementById("refIndicatorLabel");
+      if (refCity.id !== state.homeCity.id) {
+        refIndicator.style.display = "inline";
+        refIndicator.textContent = `• REF: ${refCity.cityName.toUpperCase()}`;
+      } else {
+        refIndicator.style.display = "none";
+      }
       document.getElementById("scrubberRefTime").textContent = formatTimeInCity(state.selectedTimestamp, refCity);
+
+      const resetBtn = document.getElementById("resetToNowActionBtn");
+      const isModified = state.isScrubbing || state.referenceCityId !== state.homeCity.id;
+      resetBtn.className = `action-btn ${isModified ? "primary" : "secondary"}`;
 
       const slider = document.getElementById("timeRangeSlider");
       slider.value = refLocal.hour * 60 + Math.floor(refLocal.minute / 15) * 15;
@@ -1599,10 +1642,23 @@
 
     function openAddCityModal(selectingHome = false) {
       state.selectingHomeInModal = selectingHome;
-      document.getElementById("modalHeaderTitle").textContent = selectingHome ? "Select Home City" : `Add City to ${getActiveGroup().name}`;
       document.getElementById("citySearchInput").value = "";
       document.getElementById("addCityModal").style.display = "flex";
+      updateModalModeUI();
       renderCityCatalogList();
+    }
+
+    function setModalHomeMode(isHome) {
+      state.selectingHomeInModal = isHome;
+      updateModalModeUI();
+      renderCityCatalogList();
+    }
+
+    function updateModalModeUI() {
+      const isHome = state.selectingHomeInModal;
+      document.getElementById("modalHeaderTitle").textContent = isHome ? "Select Home City" : `Add City to ${getActiveGroup().name}`;
+      document.getElementById("modalModeAddBtn").classList.toggle("active", !isHome);
+      document.getElementById("modalModeHomeBtn").classList.toggle("active", isHome);
     }
 
     function closeAddCityModal() {
@@ -1615,10 +1671,16 @@
       container.innerHTML = "";
       const activeIds = getActiveGroup().cityIds;
 
-      CITY_CATALOG.filter(c =>
+      let filtered = CITY_CATALOG.filter(c =>
         !q || c.cityName.toLowerCase().includes(q) || c.country.toLowerCase().includes(q) || c.code.toLowerCase().includes(q)
-      ).forEach(city => {
+      );
+      if (state.selectingHomeInModal && !q) {
+        filtered = [state.homeCity, ...filtered.filter(c => c.id !== state.homeCity.id)];
+      }
+
+      filtered.forEach(city => {
         const alreadyInGroup = activeIds.includes(city.id);
+        const isCurrentHome = city.id === state.homeCity.id;
         const row = document.createElement("div");
         row.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--bg-card); border-radius:12px; margin-bottom:6px; cursor:pointer;";
         row.onclick = () => {
@@ -1635,13 +1697,17 @@
         };
         row.innerHTML = `
           <div>
-            <div style="font-weight:700; font-size:14px;">${city.flag} ${city.cityName} <span style="font-size:10px; color:var(--text-secondary);">(${city.code})</span></div>
+            <div style="font-weight:700; font-size:14px;">
+              ${city.flag} ${city.cityName}
+              <span style="font-size:10px; color:var(--text-secondary);">(${city.code})</span>
+              ${isCurrentHome ? '<span class="role-badge home" style="margin-left:4px;">🏠 HOME</span>' : ''}
+            </div>
             <div style="font-size:11px; color:var(--text-secondary);">${city.country} • ${city.tz}</div>
           </div>
           <div style="text-align:right;">
             <div style="font-weight:700; font-size:13px;">${formatTimeInCity(state.selectedTimestamp, city)}</div>
-            <div style="font-size:10px; color:${alreadyInGroup && !state.selectingHomeInModal ? 'var(--cal-green)' : 'var(--text-secondary)'};">
-              ${alreadyInGroup && !state.selectingHomeInModal ? "Added ✓" : getRelativeOffsetBadge(city, state.homeCity, state.selectedTimestamp)}
+            <div style="font-size:10px; color:${state.selectingHomeInModal && isCurrentHome ? 'var(--cal-blue)' : (alreadyInGroup && !state.selectingHomeInModal ? 'var(--cal-green)' : 'var(--text-secondary)')};">
+              ${state.selectingHomeInModal && isCurrentHome ? "Current Home" : (alreadyInGroup && !state.selectingHomeInModal ? "Added ✓" : getRelativeOffsetBadge(city, state.homeCity, state.selectedTimestamp))}
             </div>
           </div>
         `;
@@ -1651,14 +1717,17 @@
 
     function buildShareSnippetText() {
       const refCity = getReferenceCity();
+      const titleInput = document.getElementById("shareMeetingTitleInput");
+      const title = titleInput && titleInput.value.trim() ? titleInput.value.trim() : "Proposed Meeting";
+      const durationMs = (state.shareDurationMinutes || 60) * 60000;
       const dateStr = new Intl.DateTimeFormat("en-US", {
         timeZone: refCity.tz, weekday: "short", month: "short", day: "numeric"
       }).format(new Date(state.selectedTimestamp));
 
-      const lines = [`📅 Proposed Meeting — ${dateStr}`, "────────────────────────────────"];
+      const lines = [`📅 ${title} — ${dateStr}`, "────────────────────────────────"];
       getAllComparedCities().forEach(c => {
         const start = formatTimeInCity(state.selectedTimestamp, c);
-        const end = formatTimeInCity(state.selectedTimestamp + 3600000, c);
+        const end = formatTimeInCity(state.selectedTimestamp + durationMs, c);
         const p = getDayPhase(getLocalParts(state.selectedTimestamp, c.tz).hour);
         const dayShift = getRelativeDayLabel(c, refCity, state.selectedTimestamp);
         lines.push(`${p.icon} ${c.flag} ${c.cityName} (${c.code}): ${start} – ${end}${dayShift !== "Today" ? " (" + dayShift + ")" : ""}`);
@@ -1667,41 +1736,34 @@
       return lines.join("\n");
     }
 
+    function renderShareTab() {
+      const pillsBox = document.getElementById("shareDurationPills");
+      if (!pillsBox) return;
+      pillsBox.innerHTML = "";
+      [
+        { label: "30m", mins: 30 },
+        { label: "1h", mins: 60 },
+        { label: "90m", mins: 90 },
+        { label: "2h", mins: 120 }
+      ].forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = `group-pill ${state.shareDurationMinutes === opt.mins ? "active" : ""}`;
+        btn.textContent = opt.label;
+        btn.onclick = () => {
+          state.shareDurationMinutes = opt.mins;
+          renderShareTab();
+        };
+        pillsBox.appendChild(btn);
+      });
+      document.getElementById("shareSnippetPreviewBox").textContent = buildShareSnippetText();
+    }
+
     function copyShareSnippet() {
       const text = buildShareSnippetText();
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text);
       }
       showToast("📋 Multi-timezone meeting snippet copied to clipboard!");
-    }
-
-    function exportICSInvite() {
-      const start = new Date(state.selectedTimestamp);
-      const end = new Date(state.selectedTimestamp + 3600000);
-      const toICSDate = d => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-      const desc = buildShareSnippetText().replace(/\n/g, "\\n");
-      const ics = [
-        "BEGIN:VCALENDAR",
-        "VERSION:2.0",
-        "PRODID:-//TimezoneCal iOS//EN",
-        "BEGIN:VEVENT",
-        `DTSTAMP:${toICSDate(new Date())}`,
-        `DTSTART:${toICSDate(start)}`,
-        `DTEND:${toICSDate(end)}`,
-        "SUMMARY:Global Team Sync (TimezoneCal)",
-        `DESCRIPTION:${desc}`,
-        "END:VEVENT",
-        "END:VCALENDAR"
-      ].join("\r\n");
-
-      const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "TimezoneCal-Meeting.ics";
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast("📅 Calendar Event (.ics) generated for Apple Calendar!");
     }
 
     function showToast(msg) {
@@ -1713,11 +1775,12 @@
     }
 
     function switchTab(tab) {
-      const isConv = tab === "converter";
-      document.getElementById("converterTabView").style.display = isConv ? "flex" : "none";
-      document.getElementById("widgetsTabView").style.display = isConv ? "none" : "block";
-      document.getElementById("tabConverterBtn").classList.toggle("active", isConv);
-      document.getElementById("tabWidgetsBtn").classList.toggle("active", !isConv);
+      document.getElementById("converterTabView").style.display = tab === "converter" ? "flex" : "none";
+      document.getElementById("shareTabView").style.display = tab === "share" ? "block" : "none";
+      document.getElementById("widgetsTabView").style.display = tab === "widgets" ? "block" : "none";
+      document.getElementById("tabConverterBtn").classList.toggle("active", tab === "converter");
+      document.getElementById("tabShareBtn").classList.toggle("active", tab === "share");
+      document.getElementById("tabWidgetsBtn").classList.toggle("active", tab === "widgets");
       renderAll();
     }
 
@@ -1736,28 +1799,28 @@
       document.getElementById("selectedDateSubtitle").textContent = `${subDate} • ${refCity.cityName}`;
 
       const showNow = state.isScrubbing || state.referenceCityId !== state.homeCity.id;
-      document.getElementById("resetNowBtn").style.display = showNow ? "inline-block" : "none";
       document.getElementById("islandLabel").textContent = showNow ? "SCRUBBING" : "LIVE SYNC";
-      document.getElementById("reorderLabelBtn").textContent = state.editMode ? "Done" : "Reorder / Edit";
+
+      const editBtn = document.getElementById("editModeBtn");
+      editBtn.textContent = state.editMode ? "✓" : "✎";
+      editBtn.style.background = state.editMode ? "var(--cal-red)" : "var(--bg-tertiary)";
+      editBtn.style.color = state.editMode ? "#fff" : "var(--text-primary)";
+      document.getElementById("reorderLabelBtn").textContent = state.editMode ? "Done" : "";
 
       renderWeekStrip();
       renderGroupsAndDST();
 
-      // Home Card
-      const homeContainer = document.getElementById("homeCityCardContainer");
-      homeContainer.innerHTML = "";
-      homeContainer.appendChild(buildCityCardElement(state.homeCity, true));
-
-      // Target Group Cards
+      // Target Group Cards (Home section removed for maximum card density)
       const activeGroup = getActiveGroup();
-      document.getElementById("groupSectionTitle").textContent = `${activeGroup.name.toUpperCase()} CITIES (${activeGroup.cityIds.length})`;
+      document.getElementById("groupSectionTitle").textContent = `${activeGroup.name.toUpperCase()} (${activeGroup.cityIds.length}) • TAP CARD FOR REF`;
       const targetContainer = document.getElementById("targetCitiesContainer");
       targetContainer.innerHTML = "";
       getActiveCities().forEach(c => {
-        targetContainer.appendChild(buildCityCardElement(c, false));
+        targetContainer.appendChild(buildCityCardElement(c, c.id === state.homeCity.id));
       });
 
       renderGoldenHoursAndScrubber();
+      renderShareTab();
       renderWidgetsTab();
     }
 

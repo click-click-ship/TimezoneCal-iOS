@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Displays a single city's timezone card with Apple Calendar styling, Day/Night phase pills,
+/// Displays a single city's timezone card with compact Apple Calendar styling, Day/Night phase pills,
 /// 1-Tap Reference switching, and an interactive World Time Buddy-inspired 24-hour scrubbing band.
 public struct CityRowCardView: View {
     @EnvironmentObject private var store: TimezoneStore
@@ -14,10 +14,6 @@ public struct CityRowCardView: View {
 
     private var phase: DayPhase {
         city.dayPhase(at: store.selectedDate)
-    }
-
-    private var selectedHourInCity: Int {
-        city.localComponents(at: store.selectedDate).hour ?? 12
     }
 
     private var selectedMinuteInCity: Int {
@@ -47,25 +43,25 @@ public struct CityRowCardView: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 6) {
             // MARK: Top Row — City Identity, Offset Badge, Converted Time & Day/Night Status
-            HStack(alignment: .top, spacing: 10) {
+            HStack(alignment: .center, spacing: 8) {
                 // Left: City Name, Flag, Role Badge & Country/Abbreviation
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(spacing: 6) {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 5) {
                         Text(city.flagEmoji)
-                            .font(.system(size: 18))
+                            .font(.system(size: 16))
 
                         Text(city.cityName)
-                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
                             .foregroundStyle(.primary)
                             .lineLimit(1)
 
                         if isHomeCity {
                             Label("HOME", systemImage: "house.fill")
-                                .font(.system(size: 9, weight: .heavy))
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
+                                .font(.system(size: 8.5, weight: .heavy))
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 1.5)
                                 .background(Color.blue.opacity(0.16), in: Capsule())
                                 .foregroundStyle(.blue)
                         }
@@ -76,9 +72,9 @@ public struct CityRowCardView: View {
                             at: store.selectedDate,
                             isReference: isReference
                         ))
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 2.5)
+                        .font(.system(size: 9.5, weight: .bold, design: .rounded))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
                         .background(
                             isReference ? Color.red : Color(.tertiarySystemFill),
                             in: Capsule()
@@ -86,14 +82,15 @@ public struct CityRowCardView: View {
                         .foregroundStyle(isReference ? .white : .secondary)
                     }
 
-                    HStack(spacing: 6) {
+                    HStack(spacing: 4) {
                         Text("\(city.countryOrRegion) • \(city.abbreviation(at: store.selectedDate))")
-                            .font(.caption)
+                            .font(.caption2)
                             .foregroundStyle(.secondary)
+                            .lineLimit(1)
 
                         let dayLabel = city.relativeDayLabel(relativeTo: store.referenceCity, at: store.selectedDate)
                         Text("• \(dayLabel)")
-                            .font(.caption.weight(dayLabel == "Today" ? .regular : .bold))
+                            .font(.caption2.weight(dayLabel == "Today" ? .regular : .bold))
                             .foregroundStyle(dayLabel == "Today" ? .secondary : .red)
                     }
                 }
@@ -101,19 +98,19 @@ public struct CityRowCardView: View {
                 Spacer(minLength: 4)
 
                 // Right: Converted Monospaced Time & Local Day/Night Pill
-                VStack(alignment: .trailing, spacing: 4) {
+                VStack(alignment: .trailing, spacing: 2) {
                     Text(city.formattedTime(at: store.selectedDate, use24Hour: store.use24HourFormat))
-                        .font(.system(size: 24, weight: .bold, design: .rounded).monospacedDigit())
+                        .font(.system(size: 20, weight: .bold, design: .rounded).monospacedDigit())
                         .foregroundStyle(isReference ? .red : .primary)
 
-                    HStack(spacing: 4) {
+                    HStack(spacing: 3) {
                         Image(systemName: phase.symbolName)
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.system(size: 9, weight: .bold))
                         Text(phase.rawValue)
-                            .font(.system(size: 10, weight: .semibold))
+                            .font(.system(size: 9.5, weight: .semibold))
                     }
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 2.5)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 1.5)
                     .background(phaseBackgroundTint(for: phase), in: Capsule())
                     .foregroundStyle(phaseForegroundTint(for: phase))
                 }
@@ -126,7 +123,6 @@ public struct CityRowCardView: View {
             // MARK: Bottom Row — Synchronized 24-Hour World Time Buddy Scrubbing Band
             GeometryReader { geo in
                 let totalWidth = max(1, geo.size.width)
-                let cellWidth = totalWidth / 24.0
                 let aligned = alignedHoursForReferenceDay
 
                 ZStack(alignment: .leading) {
@@ -139,10 +135,10 @@ public struct CityRowCardView: View {
                                 // Golden Overlap Top Dot
                                 Circle()
                                     .fill(item.isGolden ? Color.green : Color.clear)
-                                    .frame(width: 4, height: 4)
+                                    .frame(width: 3.5, height: 3.5)
 
                                 Text("\(item.cityHour)")
-                                    .font(.system(size: 9, weight: isSelectedColumn ? .heavy : .medium, design: .rounded).monospacedDigit())
+                                    .font(.system(size: 8.5, weight: isSelectedColumn ? .heavy : .medium, design: .rounded).monospacedDigit())
                                     .foregroundStyle(
                                         isSelectedColumn
                                             ? .white
@@ -151,7 +147,7 @@ public struct CityRowCardView: View {
                             }
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .background(
-                                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                                RoundedRectangle(cornerRadius: 3.5, style: .continuous)
                                     .fill(
                                         isSelectedColumn
                                             ? Color.red
@@ -167,7 +163,7 @@ public struct CityRowCardView: View {
 
                     Rectangle()
                         .fill(Color.red)
-                        .frame(width: 2, height: 34)
+                        .frame(width: 2, height: 24)
                         .offset(x: xOffset)
                         .allowsHitTesting(false)
                 }
@@ -184,21 +180,22 @@ public struct CityRowCardView: View {
                         }
                 )
             }
-            .frame(height: 32)
+            .frame(height: 23)
         }
-        .padding(14)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
         .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .fill(Color(.secondarySystemGroupedBackground))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .strokeBorder(
                             isReference ? Color.red.opacity(0.75) : Color(.separator).opacity(0.25),
                             lineWidth: isReference ? 1.8 : 0.8
                         )
                 )
         )
-        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
+        .shadow(color: Color.black.opacity(0.03), radius: 4, x: 0, y: 1)
     }
 
     // MARK: - Semantic Day/Night Styling Helpers

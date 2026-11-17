@@ -6,24 +6,35 @@ public struct AddCitySheetView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var searchText: String = ""
-    @State private var mode: SelectionMode = .addToGroup
+    @State private var mode: SelectionMode
 
-    public enum SelectionMode: String, CaseIterable {
+    public enum SelectionMode: String, CaseIterable, Identifiable {
         case addToGroup = "Add to List"
         case setHomeCity = "Change Home City"
+
+        public var id: String { rawValue }
     }
 
-    public init() {}
+    public init(initialMode: SelectionMode = .addToGroup) {
+        _mode = State(initialValue: initialMode)
+    }
 
     private var filteredCities: [CityTimezone] {
-        CityCatalog.search(query: searchText)
+        let base = CityCatalog.search(query: searchText)
+        if mode == .setHomeCity && searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            // Keep current home city pinned at the very top when browsing
+            var reordered = base.filter { $0.id != store.homeCity.id }
+            reordered.insert(store.homeCity, at: 0)
+            return reordered
+        }
+        return base
     }
 
     public var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 Picker("Action", selection: $mode) {
-                    ForEach(SelectionMode.allCases, id: \.self) { item in
+                    ForEach(SelectionMode.allCases) { item in
                         Text(item.rawValue).tag(item)
                     }
                 }
@@ -62,6 +73,15 @@ public struct AddCitySheetView: View {
                                             .padding(.vertical, 1.5)
                                             .background(Color(.tertiarySystemFill), in: Capsule())
                                             .foregroundStyle(.secondary)
+
+                                        if isCurrentHome {
+                                            Label("HOME", systemImage: "house.fill")
+                                                .font(.system(size: 9, weight: .heavy))
+                                                .padding(.horizontal, 6)
+                                                .padding(.vertical, 2)
+                                                .background(Color.blue.opacity(0.16), in: Capsule())
+                                                .foregroundStyle(.blue)
+                                        }
                                     }
 
                                     Text("\(city.countryOrRegion) • \(city.timeZoneIdentifier)")

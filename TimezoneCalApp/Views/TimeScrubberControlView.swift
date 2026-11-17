@@ -4,14 +4,16 @@ import UIKit
 #endif
 
 /// Frosted-glass bottom control bar with "Golden Hours" Overlap detector pill,
-/// 15-minute precision time slider, quick step buttons, ShareLink, and 1-Tap Apple Calendar (`EventKit`) export.
+/// tappable Home City selector (with visual Home badge), 15-minute precision time slider,
+/// -1h/+1h quick steps, and 1-Tap "Reset to Now".
 public struct TimeScrubberControlView: View {
     @EnvironmentObject private var store: TimezoneStore
 
-    @State private var showCalendarExportAlert: Bool = false
-    @State private var calendarExportMessage: String = ""
-    @State private var meetingTitleInput: String = "Global Team Sync"
-    @State private var showTitlePromptSheet: Bool = false
+    @Binding var activeCitySheetMode: AddCitySheetView.SelectionMode?
+
+    public init(activeCitySheetMode: Binding<AddCitySheetView.SelectionMode?>) {
+        _activeCitySheetMode = activeCitySheetMode
+    }
 
     private var currentMinutesInReferenceDay: Double {
         let comps = store.referenceCity.localComponents(at: store.selectedDate)
@@ -20,8 +22,12 @@ public struct TimeScrubberControlView: View {
         return Double(h * 60 + m)
     }
 
+    private var isScrubbingInHome: Bool {
+        store.activeReferenceCityID == store.homeCity.id
+    }
+
     public var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 7) {
             // MARK: 1. "Golden Hours" Best Overlap Detector Pill
             if let window = store.bestGoldenOverlapWindow {
                 Button {
@@ -32,7 +38,7 @@ public struct TimeScrubberControlView: View {
                 } label: {
                     HStack(spacing: 6) {
                         Image(systemName: "sparkles")
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.system(size: 11, weight: .bold))
                             .foregroundStyle(.green)
 
                         let startLabel = store.referenceCity.compactHourLabel(
@@ -45,25 +51,26 @@ public struct TimeScrubberControlView: View {
                         )
 
                         Text("Golden Hours (\(window.matchingCityCount)/\(window.totalCityCount) awake): **\(startLabel) – \(endLabel) \(store.referenceCity.shortCode)**")
-                            .font(.system(size: 12))
+                            .font(.system(size: 11.5))
                             .foregroundStyle(.primary)
+                            .lineLimit(1)
 
-                        Spacer()
+                        Spacer(minLength: 4)
 
                         Text("Jump")
-                            .font(.system(size: 11, weight: .bold))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
+                            .font(.system(size: 10.5, weight: .bold))
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 2.5)
                             .background(Color.green, in: Capsule())
                             .foregroundStyle(.white)
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 7)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5.5)
                     .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
                             .fill(Color.green.opacity(0.13))
                             .overlay(
-                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
                                     .strokeBorder(Color.green.opacity(0.35), lineWidth: 1)
                             )
                     )
@@ -71,25 +78,59 @@ public struct TimeScrubberControlView: View {
                 .buttonStyle(.plain)
             }
 
-            // MARK: 2. Active Reference Readout & Quick Stepper Buttons
-            HStack(spacing: 8) {
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("SCRUBBING IN \(store.referenceCity.cityName.uppercased())")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(.secondary)
+            // MARK: 2. Tappable Home Selector + Active Reference Readout & -1h/+1h Stepper Buttons
+            HStack(alignment: .center, spacing: 8) {
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 6) {
+                        // Interactive Home Selection Pill (opens Change Home City search filter)
+                        Button {
+                            activeCitySheetMode = .setHomeCity
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "house.fill")
+                                    .font(.system(size: 9.5, weight: .bold))
+                                Text("HOME: \(store.homeCity.cityName.uppercased())")
+                                    .font(.system(size: 10, weight: .heavy))
+                                    .lineLimit(1)
+                                Image(systemName: "chevron.up.chevron.down")
+                                    .font(.system(size: 8.5, weight: .bold))
+                            }
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(Color.blue.opacity(0.14), in: Capsule())
+                            .overlay(
+                                Capsule()
+                                    .strokeBorder(Color.blue.opacity(0.35), lineWidth: 0.8)
+                            )
+                            .foregroundStyle(.blue)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Change Home City, currently \(store.homeCity.cityName)")
 
-                    Text(store.referenceCity.formattedTime(at: store.selectedDate, use24Hour: store.use24HourFormat))
-                        .font(.system(size: 20, weight: .bold, design: .rounded).monospacedDigit())
-                        .foregroundStyle(.red)
+                        if !isScrubbingInHome {
+                            Text("• REF: \(store.referenceCity.cityName.uppercased())")
+                                .font(.system(size: 9.5, weight: .bold))
+                                .foregroundStyle(.red)
+                                .lineLimit(1)
+                        }
+                    }
+
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(store.referenceCity.formattedTime(at: store.selectedDate, use24Hour: store.use24HourFormat))
+                            .font(.system(size: 19, weight: .bold, design: .rounded).monospacedDigit())
+                            .foregroundStyle(.red)
+
+                        Text(store.referenceCity.abbreviation(at: store.selectedDate))
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 Spacer()
 
-                // Quick Step Buttons (-1h, -15m, +15m, +1h)
+                // Quick Step Buttons (-1h, +1h only)
                 HStack(spacing: 6) {
                     stepButton(label: "-1h", minutes: -60)
-                    stepButton(label: "-15m", minutes: -15)
-                    stepButton(label: "+15m", minutes: 15)
                     stepButton(label: "+1h", minutes: 60)
                 }
             }
@@ -114,116 +155,38 @@ public struct TimeScrubberControlView: View {
             )
             .tint(.red)
 
-            // MARK: 4. 1-Tap Share Snippet & Add to Apple Calendar Bar
-            HStack(spacing: 10) {
-                let snippet = CalendarExportService.buildShareSnippet(
-                    title: meetingTitleInput,
-                    startDate: store.selectedDate,
-                    durationMinutes: 60,
-                    cities: store.allComparedCities,
-                    referenceCity: store.referenceCity,
-                    use24Hour: store.use24HourFormat
+            // MARK: 4. 1-Tap "Reset to Now" Button
+            Button {
+                triggerHaptic()
+                store.resetToNow()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.system(size: 12, weight: .bold))
+                    Text("Reset to Now")
+                        .font(.system(size: 13, weight: .semibold))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+                .background(
+                    (store.isScrubbingCustomTime || !isScrubbingInHome)
+                        ? Color.red
+                        : Color(.tertiarySystemFill),
+                    in: RoundedRectangle(cornerRadius: 11, style: .continuous)
                 )
-
-                ShareLink(item: snippet) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: 13, weight: .bold))
-                        Text("Share Times")
-                            .font(.system(size: 13, weight: .semibold))
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background(Color(.tertiarySystemFill), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .foregroundStyle(.primary)
-                }
-
-                Button {
-                    showTitlePromptSheet = true
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "calendar.badge.plus")
-                            .font(.system(size: 13, weight: .bold))
-                        Text("Add to Calendar")
-                            .font(.system(size: 13, weight: .semibold))
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background(Color.red, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .foregroundStyle(.white)
-                }
+                .foregroundStyle(
+                    (store.isScrubbingCustomTime || !isScrubbingInHome)
+                        ? .white
+                        : .primary
+                )
             }
+            .buttonStyle(.plain)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
         .background(.ultraThinMaterial)
         .overlay(alignment: .top) {
             Divider()
-        }
-        .alert("Apple Calendar", isPresented: $showCalendarExportAlert) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(calendarExportMessage)
-        }
-        .sheet(isPresented: $showTitlePromptSheet) {
-            NavigationStack {
-                Form {
-                    Section("Meeting Details") {
-                        TextField("Meeting Title", text: $meetingTitleInput)
-                        LabeledContent("Date", value: store.referenceCity.formattedShortDate(at: store.selectedDate))
-                        LabeledContent(
-                            "Start Time (\(store.referenceCity.cityName))",
-                            value: store.referenceCity.formattedTime(at: store.selectedDate, use24Hour: store.use24HourFormat)
-                        )
-                    }
-
-                    Section("Converted Timezone Breakdown") {
-                        ForEach(store.allComparedCities) { city in
-                            HStack {
-                                Text("\(city.flagEmoji) \(city.cityName)")
-                                Spacer()
-                                Text(city.formattedTime(at: store.selectedDate, use24Hour: store.use24HourFormat))
-                                    .font(.body.monospacedDigit().weight(.semibold))
-                                Text(city.abbreviation(at: store.selectedDate))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                    }
-                }
-                .navigationTitle("Add to Calendar")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            showTitlePromptSheet = false
-                        }
-                    }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Save Event") {
-                            showTitlePromptSheet = false
-                            Task {
-                                do {
-                                    calendarExportMessage = try await CalendarExportService.addEventToAppleCalendar(
-                                        title: meetingTitleInput,
-                                        startDate: store.selectedDate,
-                                        durationMinutes: 60,
-                                        cities: store.allComparedCities,
-                                        referenceCity: store.referenceCity,
-                                        use24Hour: store.use24HourFormat
-                                    )
-                                } catch {
-                                    calendarExportMessage = error.localizedDescription
-                                }
-                                showCalendarExportAlert = true
-                            }
-                        }
-                        .fontWeight(.bold)
-                        .tint(.red)
-                    }
-                }
-            }
-            .presentationDetents([.medium, .large])
         }
     }
 
@@ -234,7 +197,7 @@ public struct TimeScrubberControlView: View {
         } label: {
             Text(label)
                 .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .padding(.horizontal, 9)
+                .padding(.horizontal, 11)
                 .padding(.vertical, 6)
                 .background(Color(.tertiarySystemFill), in: Capsule())
                 .foregroundStyle(.primary)
