@@ -118,7 +118,7 @@ public struct CityRowCardView: View {
                 isReference ? Color.red : Color(.tertiarySystemFill),
                 in: Capsule()
             )
-            .foregroundStyle(isReference ? .white : .secondary)
+            .foregroundStyle(isReference ? AnyShapeStyle(Color.white) : AnyShapeStyle(.secondary))
     }
 
     private var citySubtitleLine: some View {
@@ -133,7 +133,7 @@ public struct CityRowCardView: View {
 
             Text("• \(dayLabel)")
                 .font(.caption2.weight(isToday ? .regular : .bold))
-                .foregroundStyle(isToday ? .secondary : .red)
+                .foregroundStyle(isToday ? AnyShapeStyle(.secondary) : AnyShapeStyle(Color.red))
         }
     }
 
@@ -141,7 +141,7 @@ public struct CityRowCardView: View {
         VStack(alignment: .trailing, spacing: 2) {
             Text(city.formattedTime(at: store.selectedDate, use24Hour: store.use24HourFormat))
                 .font(.system(size: 20, weight: .bold, design: .rounded).monospacedDigit())
-                .foregroundStyle(isReference ? .red : .primary)
+                .foregroundStyle(isReference ? AnyShapeStyle(Color.red) : AnyShapeStyle(.primary))
 
             phasePill
         }
