@@ -116,7 +116,7 @@ public struct CalendarHeaderView: View {
                 } label: {
                     Image(systemName: editMode == .active ? "checkmark" : "pencil")
                         .font(.system(size: 15, weight: .bold))
-                        .foregroundStyle(editMode == .active ? .white : .primary)
+                        .foregroundStyle(editMode == .active ? AnyShapeStyle(Color.white) : AnyShapeStyle(.primary))
                         .frame(width: 32, height: 32)
                         .background(
                             editMode == .active ? Color.red : Color(.tertiarySystemFill),
@@ -154,7 +154,7 @@ public struct CalendarHeaderView: View {
                         VStack(spacing: 3) {
                             Text(shortWeekdaySymbol(for: day))
                                 .font(.system(size: 10, weight: .semibold))
-                                .foregroundStyle(isSelected ? .red : .secondary)
+                                .foregroundStyle(isSelected ? AnyShapeStyle(Color.red) : AnyShapeStyle(.secondary))
 
                             ZStack {
                                 if isSelected {
@@ -171,8 +171,8 @@ public struct CalendarHeaderView: View {
                                     .font(.system(size: 14, weight: isSelected || isToday ? .bold : .medium, design: .rounded))
                                     .foregroundStyle(
                                         isSelected
-                                            ? Color(.systemBackground)
-                                            : (isToday ? Color.red : Color.primary)
+                                            ? AnyShapeStyle(Color(.systemBackground))
+                                            : (isToday ? AnyShapeStyle(Color.red) : AnyShapeStyle(.primary))
                                     )
                             }
                         }
@@ -236,7 +236,7 @@ public struct CalendarHeaderView: View {
                                 isSelected ? Color.red : Color(.secondarySystemGroupedBackground),
                                 in: Capsule()
                             )
-                            .foregroundStyle(isSelected ? .white : .primary)
+                            .foregroundStyle(isSelected ? AnyShapeStyle(Color.white) : AnyShapeStyle(.primary))
                         }
                         .buttonStyle(.plain)
                     }

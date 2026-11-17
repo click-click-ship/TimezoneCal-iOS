@@ -176,8 +176,8 @@ public struct TimeScrubberControlView: View {
                 )
                 .foregroundStyle(
                     (store.isScrubbingCustomTime || !isScrubbingInHome)
-                        ? .white
-                        : .primary
+                        ? AnyShapeStyle(Color.white)
+                        : AnyShapeStyle(.primary)
                 )
             }
             .buttonStyle(.plain)

@@ -41,7 +41,7 @@ public struct ManageGroupsSheetView: View {
                                             selectedIcon == icon ? Color.red : Color(.tertiarySystemFill),
                                             in: Circle()
                                         )
-                                        .foregroundStyle(selectedIcon == icon ? .white : .primary)
+                                        .foregroundStyle(selectedIcon == icon ? AnyShapeStyle(Color.white) : AnyShapeStyle(.primary))
                                 }
                                 .buttonStyle(.plain)
                             }

@@ -103,7 +103,7 @@ public struct SixHourTimelineMediumWidgetView: View {
                                                     : (phase == .working ? Color.green.opacity(0.22) : Color.indigo.opacity(0.16))
                                             )
                                     )
-                                    .foregroundStyle(offset == 0 ? .white : .primary)
+                                    .foregroundStyle(offset == 0 ? AnyShapeStyle(Color.white) : AnyShapeStyle(.primary))
                             }
                         }
                     }
