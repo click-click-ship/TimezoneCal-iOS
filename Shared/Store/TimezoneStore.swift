@@ -318,6 +318,20 @@ public final class TimezoneStore: ObservableObject {
         }
     }
 
+    public func renameGroup(_ group: CityGroup, to newName: String, iconName: String? = nil) {
+        let trimmed = newName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty,
+              let idx = groups.firstIndex(where: { $0.id == group.id }) else { return }
+        groups[idx].name = trimmed
+        if let iconName {
+            groups[idx].iconName = iconName
+        }
+    }
+
+    public func moveGroups(from source: IndexSet, to destination: Int) {
+        groups.move(fromOffsets: source, toOffset: destination)
+    }
+
     public func toggleWidgetPin(for city: CityTimezone) {
         if let existingIdx = widgetPinnedCityIDs.firstIndex(of: city.id) {
             if widgetPinnedCityIDs.count > 1 {

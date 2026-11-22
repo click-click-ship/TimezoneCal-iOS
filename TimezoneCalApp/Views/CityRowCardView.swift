@@ -156,8 +156,8 @@ public struct CityRowCardView: View {
         }
         .padding(.horizontal, 6)
         .padding(.vertical, 1.5)
-        .background(phaseBackgroundTint(for: phase), in: Capsule())
-        .foregroundStyle(phaseForegroundTint(for: phase))
+        .background(phase.pillBackgroundColor, in: Capsule())
+        .foregroundStyle(phase.pillForegroundColor)
     }
 
     private var scrubbingBandRow: some View {
@@ -237,24 +237,6 @@ public struct CityRowCardView: View {
     }
 
     // MARK: - Semantic Day/Night Styling Helpers
-
-    private func phaseBackgroundTint(for phase: DayPhase) -> Color {
-        switch phase {
-        case .working:  return Color.green.opacity(0.15)
-        case .morning:  return Color.orange.opacity(0.16)
-        case .evening:  return Color.purple.opacity(0.16)
-        case .sleeping: return Color.indigo.opacity(0.20)
-        }
-    }
-
-    private func phaseForegroundTint(for phase: DayPhase) -> Color {
-        switch phase {
-        case .working:  return Color.green
-        case .morning:  return Color.orange
-        case .evening:  return Color.purple
-        case .sleeping: return Color.indigo
-        }
-    }
 
     private func timelineCellBackgroundColor(for phase: DayPhase) -> Color {
         switch phase {

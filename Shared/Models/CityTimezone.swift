@@ -42,6 +42,26 @@ public enum DayPhase: String, Codable, CaseIterable, Sendable {
         }
     }
 
+    /// Background tint for DayPhase status pills
+    public var pillBackgroundColor: Color {
+        switch self {
+        case .working:  return Color.green.opacity(0.15)
+        case .morning:  return Color.orange.opacity(0.16)
+        case .evening:  return Color.purple.opacity(0.16)
+        case .sleeping: return Color.indigo.opacity(0.20)
+        }
+    }
+
+    /// Foreground tint for DayPhase status pills
+    public var pillForegroundColor: Color {
+        switch self {
+        case .working:  return Color.green
+        case .morning:  return Color.orange
+        case .evening:  return Color.purple
+        case .sleeping: return Color.indigo
+        }
+    }
+
     /// Determine phase from a 24-hour integer (0...23)
     public static func from(hour: Int) -> DayPhase {
         let normalized = ((hour % 24) + 24) % 24

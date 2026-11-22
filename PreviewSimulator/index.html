@@ -6,6 +6,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="TimezoneCal" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="apple-touch-icon.png" />
   <title>TimezoneCal iOS — Interactive iPhone 16 Pro & WidgetKit Simulator</title>
   <style>
     :root {
@@ -605,49 +607,53 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 4px;
+      gap: 8px;
+      margin-bottom: 5px;
     }
-    .home-selector-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: rgba(0, 122, 255, 0.14);
-      border: 1px solid rgba(0, 122, 255, 0.35);
-      color: var(--cal-blue);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.3px;
-      padding: 3px 8px;
-      border-radius: 999px;
+    .home-card-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      text-align: left;
       cursor: pointer;
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
     }
-    .ref-indicator-text {
-      font-size: 9.5px;
+    .home-title-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .home-city-name {
+      font-size: 17px;
       font-weight: 800;
-      color: var(--cal-red);
-      margin-left: 5px;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+    }
+    .home-chevron {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--cal-blue);
+    }
+    .home-subtitle {
+      font-size: 10.5px;
+      color: var(--text-secondary);
+    }
+    .scrubber-time-col {
+      text-align: right;
+      flex-shrink: 0;
     }
     .scrubber-ref-time {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 800;
       color: var(--cal-red);
       font-variant-numeric: tabular-nums;
-      margin-top: 2px;
-    }
-
-    .step-btn-group {
-      display: flex;
-      gap: 5px;
-    }
-    .step-btn {
-      border: none;
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-      font-size: 11.5px;
-      font-weight: 700;
-      padding: 6px 11px;
-      border-radius: 999px;
-      cursor: pointer;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
     }
 
     .time-slider {
@@ -889,20 +895,18 @@
         <div id="goldenHoursContainer"></div>
 
         <div class="scrubber-readout-row">
-          <div>
-            <div style="display:flex; align-items:center; flex-wrap:wrap;">
-              <button class="home-selector-pill" onclick="openAddCityModal(true)" title="Change Home City">
-                <span>🏠</span>
-                <span id="homePillLabel">HOME: SAN FRANCISCO</span>
-                <span>▾</span>
-              </button>
-              <span class="ref-indicator-text" id="refIndicatorLabel" style="display:none;"></span>
+          <button class="home-card-btn" onclick="openAddCityModal(true)" title="Change Home City">
+            <div class="home-title-row">
+              <span style="font-size:16px;" id="homeFlagEmoji">🇺🇸</span>
+              <span class="home-city-name" id="homeCityNameLabel">San Francisco</span>
+              <span class="role-badge home">🏠 HOME</span>
+              <span class="home-chevron">⌄</span>
             </div>
+            <div class="home-subtitle" id="homeSubtitleLabel">PST • Tap to change</div>
+          </button>
+          <div class="scrubber-time-col">
             <div class="scrubber-ref-time" id="scrubberRefTime">9:00 AM</div>
-          </div>
-          <div class="step-btn-group">
-            <button class="step-btn" onclick="shiftMinutes(-60)">-1h</button>
-            <button class="step-btn" onclick="shiftMinutes(60)">+1h</button>
+            <div id="scrubberRightSub"></div>
           </div>
         </div>
 
@@ -1001,6 +1005,27 @@
           oninput="renderCityCatalogList()"
         />
         <div id="cityCatalogList" style="flex:1; overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <!-- Manage Groups Modal (Add, Rename, Reorder, Delete) -->
+    <div class="modal-backdrop" id="manageGroupsModal" style="display:none;">
+      <div class="modal-sheet">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <button class="section-action-btn" onclick="openGroupForm(null)" style="font-size:14px;">+ New</button>
+          <strong style="font-size:17px;">City Groups</strong>
+          <button class="section-action-btn" onclick="closeManageGroupsModal()" style="font-size:14px;">Done</button>
+        </div>
+        <div id="groupEditorFormBox" style="display:none; background:var(--bg-card); border-radius:14px; padding:12px; margin-bottom:10px; border:1px solid var(--border-subtle);">
+          <div style="font-size:12px; font-weight:700; margin-bottom:6px;" id="groupEditorTitle">New Group</div>
+          <input type="text" id="groupNameInput" class="search-input" style="margin:0 0 8px;" placeholder="Group Name (e.g. Clients, APAC Team)" />
+          <div style="display:flex; gap:6px; overflow-x:auto; margin-bottom:10px;" id="groupIconPicker"></div>
+          <div style="display:flex; gap:8px;">
+            <button class="action-btn secondary" style="padding:7px;" onclick="cancelGroupForm()">Cancel</button>
+            <button class="action-btn primary" style="padding:7px;" onclick="saveGroupForm()">Save</button>
+          </div>
+        </div>
+        <div id="manageGroupsList" style="flex:1; overflow-y:auto;"></div>
       </div>
     </div>
   </div>
@@ -1308,17 +1333,17 @@
 
       const addGroupBtn = document.createElement("button");
       addGroupBtn.className = "group-pill";
+      addGroupBtn.style.cssText = "background:rgba(255,59,48,0.12); color:var(--cal-red); border-color:transparent;";
       addGroupBtn.innerHTML = "+ New Group";
-      addGroupBtn.onclick = () => {
-        const name = prompt("Enter a name for your new City Preset Group (e.g., Clients, APAC):");
-        if (name && name.trim()) {
-          const id = "grp_" + Date.now();
-          state.groups.push({ id, name: name.trim(), icon: "🌐", cityIds: ["nyc", "lon"] });
-          state.selectedGroupId = id;
-          renderAll();
-        }
-      };
+      addGroupBtn.onclick = () => openManageGroupsModal(true);
       groupContainer.appendChild(addGroupBtn);
+
+      const editGroupsBtn = document.createElement("button");
+      editGroupsBtn.className = "group-pill";
+      editGroupsBtn.style.cssText = "background:var(--bg-tertiary); color:var(--text-secondary); border-color:transparent;";
+      editGroupsBtn.innerHTML = "⋯ Edit";
+      editGroupsBtn.onclick = () => openManageGroupsModal(false);
+      groupContainer.appendChild(editGroupsBtn);
 
       // DST Transition Warning Check
       const refCity = getReferenceCity();
@@ -1456,15 +1481,27 @@
         goldenBox.innerHTML = "";
       }
 
-      document.getElementById("homePillLabel").textContent = `HOME: ${state.homeCity.cityName.toUpperCase()}`;
-      const refIndicator = document.getElementById("refIndicatorLabel");
-      if (refCity.id !== state.homeCity.id) {
-        refIndicator.style.display = "inline";
-        refIndicator.textContent = `• REF: ${refCity.cityName.toUpperCase()}`;
-      } else {
-        refIndicator.style.display = "none";
-      }
+      document.getElementById("homeFlagEmoji").textContent = state.homeCity.flag;
+      document.getElementById("homeCityNameLabel").textContent = state.homeCity.cityName;
+      const homeTzAbbr = new Intl.DateTimeFormat("en-US", {
+        timeZone: state.homeCity.tz, timeZoneName: "short"
+      }).formatToParts(new Date(state.selectedTimestamp)).find(p => p.type === "timeZoneName")?.value || state.homeCity.code;
+      const refSubtitle = refCity.id !== state.homeCity.id
+        ? `${homeTzAbbr} • Tap to change <span style="color:var(--cal-red); font-weight:700;">• Ref: ${refCity.cityName}</span>`
+        : `${homeTzAbbr} • Tap to change`;
+      document.getElementById("homeSubtitleLabel").innerHTML = refSubtitle;
+
       document.getElementById("scrubberRefTime").textContent = formatTimeInCity(state.selectedTimestamp, refCity);
+      const rightSub = document.getElementById("scrubberRightSub");
+      if (refCity.id === state.homeCity.id) {
+        const phase = getDayPhase(refLocal.hour);
+        rightSub.innerHTML = `<div class="phase-pill ${phase.cls}">${phase.icon} ${phase.label}</div>`;
+      } else {
+        const refTzAbbr = new Intl.DateTimeFormat("en-US", {
+          timeZone: refCity.tz, timeZoneName: "short"
+        }).formatToParts(new Date(state.selectedTimestamp)).find(p => p.type === "timeZoneName")?.value || refCity.code;
+        rightSub.innerHTML = `<span class="role-badge ref">REF: ${refCity.code}</span> <span style="font-size:10px; color:var(--text-secondary); font-weight:600;">${refTzAbbr}</span>`;
+      }
 
       const resetBtn = document.getElementById("resetToNowActionBtn");
       const isModified = state.isScrubbing || state.referenceCityId !== state.homeCity.id;
@@ -1638,6 +1675,116 @@
       g.cityIds[idx] = g.cityIds[target];
       g.cityIds[target] = tmp;
       renderAll();
+    }
+
+    const GROUP_ICONS = ["💼", "🏠", "✈️", "👥", "🏢", "🌐", "⭐"];
+    let editingGroupId = null;
+    let draftGroupIcon = "🌐";
+
+    function openManageGroupsModal(startInCreate = false) {
+      document.getElementById("manageGroupsModal").style.display = "flex";
+      if (startInCreate) {
+        openGroupForm(null);
+      } else {
+        cancelGroupForm();
+      }
+      renderManageGroupsList();
+    }
+
+    function closeManageGroupsModal() {
+      document.getElementById("manageGroupsModal").style.display = "none";
+      cancelGroupForm();
+    }
+
+    function openGroupForm(groupId) {
+      editingGroupId = groupId;
+      const existing = groupId ? state.groups.find(g => g.id === groupId) : null;
+      document.getElementById("groupEditorTitle").textContent = existing ? "Rename Group" : "New Group";
+      const input = document.getElementById("groupNameInput");
+      input.value = existing ? existing.name : "";
+      draftGroupIcon = existing ? existing.icon : "💼";
+      document.getElementById("groupEditorFormBox").style.display = "block";
+      renderGroupIconPicker();
+      setTimeout(() => input.focus(), 40);
+    }
+
+    function cancelGroupForm() {
+      editingGroupId = null;
+      document.getElementById("groupEditorFormBox").style.display = "none";
+    }
+
+    function renderGroupIconPicker() {
+      const box = document.getElementById("groupIconPicker");
+      box.innerHTML = "";
+      GROUP_ICONS.forEach(ic => {
+        const btn = document.createElement("button");
+        const active = ic === draftGroupIcon;
+        btn.style.cssText = `width:34px; height:34px; border-radius:50%; border:none; cursor:pointer; font-size:15px; flex-shrink:0; background:${active ? "var(--cal-red)" : "var(--bg-tertiary)"};`;
+        btn.textContent = ic;
+        btn.onclick = () => {
+          draftGroupIcon = ic;
+          renderGroupIconPicker();
+        };
+        box.appendChild(btn);
+      });
+    }
+
+    function saveGroupForm() {
+      const name = document.getElementById("groupNameInput").value.trim();
+      if (!name) return;
+      if (editingGroupId) {
+        const g = state.groups.find(x => x.id === editingGroupId);
+        if (g) {
+          g.name = name;
+          g.icon = draftGroupIcon;
+        }
+      } else {
+        const id = "grp_" + Date.now();
+        state.groups.push({ id, name, icon: draftGroupIcon, cityIds: ["nyc", "lon"] });
+        state.selectedGroupId = id;
+      }
+      cancelGroupForm();
+      renderManageGroupsList();
+      renderAll();
+    }
+
+    function deleteGroupFromModal(groupId) {
+      if (state.groups.length <= 1) return;
+      state.groups = state.groups.filter(g => g.id !== groupId);
+      if (state.selectedGroupId === groupId) {
+        state.selectedGroupId = state.groups[0].id;
+      }
+      renderManageGroupsList();
+      renderAll();
+    }
+
+    function renderManageGroupsList() {
+      const list = document.getElementById("manageGroupsList");
+      list.innerHTML = "";
+      state.groups.forEach(g => {
+        const isActive = g.id === state.selectedGroupId;
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--bg-card); border-radius:12px; margin-bottom:6px; gap:8px;";
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0; cursor:pointer;" onclick="state.selectedGroupId='${g.id}'; closeManageGroupsModal(); renderAll();">
+            <span style="width:30px; height:30px; border-radius:50%; background:var(--cal-red); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">${g.icon}</span>
+            <div style="min-width:0;">
+              <div style="font-weight:700; font-size:14px; display:flex; align-items:center; gap:6px;">
+                <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${g.name}</span>
+                ${isActive ? '<span class="role-badge ref">Active</span>' : ''}
+              </div>
+              <div style="font-size:11px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                ${g.cityIds.length} cities: ${g.cityIds.map(id => getCity(id).cityName).join(", ")}
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:5px; flex-shrink:0;">
+            <button class="mini-edit-btn" onclick="openGroupForm('${g.id}')" title="Rename">✎</button>
+            ${state.groups.length > 1 ? `<button class="mini-edit-btn danger" onclick="deleteGroupFromModal('${g.id}')" title="Delete">🗑</button>` : ""}
+          </div>
+        `;
+        list.appendChild(row);
+      });
     }
 
     function openAddCityModal(selectingHome = false) {

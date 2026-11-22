@@ -4,8 +4,8 @@ import UIKit
 #endif
 
 /// Frosted-glass bottom control bar with "Golden Hours" Overlap detector pill,
-/// tappable Home City selector (with visual Home badge), 15-minute precision time slider,
-/// -1h/+1h quick steps, and 1-Tap "Reset to Now".
+/// card-aligned Home City selector & Reference Time readout, 15-minute precision time slider,
+/// and 1-Tap "Reset to Now".
 public struct TimeScrubberControlView: View {
     @EnvironmentObject private var store: TimezoneStore
 
@@ -78,60 +78,85 @@ public struct TimeScrubberControlView: View {
                 .buttonStyle(.plain)
             }
 
-            // MARK: 2. Tappable Home Selector + Active Reference Readout & -1h/+1h Stepper Buttons
+            // MARK: 2. Card-Aligned Home City Selector (Left) & Active Reference Time (Right)
             HStack(alignment: .center, spacing: 8) {
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 6) {
-                        // Interactive Home Selection Pill (opens Change Home City search filter)
-                        Button {
-                            activeCitySheetMode = .setHomeCity
-                        } label: {
-                            HStack(spacing: 4) {
-                                Image(systemName: "house.fill")
-                                    .font(.system(size: 9.5, weight: .bold))
-                                Text("HOME: \(store.homeCity.cityName.uppercased())")
-                                    .font(.system(size: 10, weight: .heavy))
-                                    .lineLimit(1)
-                                Image(systemName: "chevron.up.chevron.down")
-                                    .font(.system(size: 8.5, weight: .bold))
-                            }
-                            .padding(.horizontal, 7)
-                            .padding(.vertical, 3)
-                            .background(Color.blue.opacity(0.14), in: Capsule())
-                            .overlay(
-                                Capsule()
-                                    .strokeBorder(Color.blue.opacity(0.35), lineWidth: 0.8)
-                            )
-                            .foregroundStyle(.blue)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel("Change Home City, currently \(store.homeCity.cityName)")
+                Button {
+                    activeCitySheetMode = .setHomeCity
+                } label: {
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 5) {
+                            Text(store.homeCity.flagEmoji)
+                                .font(.system(size: 16))
 
-                        if !isScrubbingInHome {
-                            Text("• REF: \(store.referenceCity.cityName.uppercased())")
-                                .font(.system(size: 9.5, weight: .bold))
-                                .foregroundStyle(.red)
+                            Text(store.homeCity.cityName)
+                                .font(.system(size: 17, weight: .bold, design: .rounded))
+                                .foregroundStyle(.primary)
                                 .lineLimit(1)
+
+                            Label("HOME", systemImage: "house.fill")
+                                .font(.system(size: 8.5, weight: .heavy))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.blue.opacity(0.16), in: Capsule())
+                                .foregroundStyle(.blue)
+
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.system(size: 9.5, weight: .bold))
+                                .foregroundStyle(.blue)
+                        }
+
+                        HStack(spacing: 4) {
+                            Text("\(store.homeCity.abbreviation(at: store.selectedDate)) • Tap to change")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+
+                            if !isScrubbingInHome {
+                                Text("• Ref: \(store.referenceCity.cityName)")
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(.red)
+                                    .lineLimit(1)
+                            }
                         }
                     }
-
-                    HStack(alignment: .firstTextBaseline, spacing: 6) {
-                        Text(store.referenceCity.formattedTime(at: store.selectedDate, use24Hour: store.use24HourFormat))
-                            .font(.system(size: 19, weight: .bold, design: .rounded).monospacedDigit())
-                            .foregroundStyle(.red)
-
-                        Text(store.referenceCity.abbreviation(at: store.selectedDate))
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(.secondary)
-                    }
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Change Home City, currently \(store.homeCity.cityName)")
 
-                Spacer()
+                Spacer(minLength: 4)
 
-                // Quick Step Buttons (-1h, +1h only)
-                HStack(spacing: 6) {
-                    stepButton(label: "-1h", minutes: -60)
-                    stepButton(label: "+1h", minutes: 60)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(store.referenceCity.formattedTime(at: store.selectedDate, use24Hour: store.use24HourFormat))
+                        .font(.system(size: 20, weight: .bold, design: .rounded).monospacedDigit())
+                        .foregroundStyle(.red)
+
+                    if isScrubbingInHome {
+                        let phase = store.referenceCity.dayPhase(at: store.selectedDate)
+                        HStack(spacing: 3) {
+                            Image(systemName: phase.symbolName)
+                                .font(.system(size: 9, weight: .bold))
+                            Text(phase.rawValue)
+                                .font(.system(size: 9.5, weight: .semibold))
+                        }
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 1.5)
+                        .background(phase.pillBackgroundColor, in: Capsule())
+                        .foregroundStyle(phase.pillForegroundColor)
+                    } else {
+                        HStack(spacing: 4) {
+                            Text("REF: \(store.referenceCity.shortCode)")
+                                .font(.system(size: 9, weight: .heavy, design: .rounded))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 1.5)
+                                .background(Color.red, in: Capsule())
+                                .foregroundStyle(.white)
+
+                            Text(store.referenceCity.abbreviation(at: store.selectedDate))
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
             }
 
@@ -188,21 +213,6 @@ public struct TimeScrubberControlView: View {
         .overlay(alignment: .top) {
             Divider()
         }
-    }
-
-    private func stepButton(label: String, minutes: Int) -> some View {
-        Button {
-            triggerHaptic()
-            store.shiftSelectedTime(byMinutes: minutes)
-        } label: {
-            Text(label)
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .padding(.horizontal, 11)
-                .padding(.vertical, 6)
-                .background(Color(.tertiarySystemFill), in: Capsule())
-                .foregroundStyle(.primary)
-        }
-        .buttonStyle(.plain)
     }
 
     private func triggerHaptic() {

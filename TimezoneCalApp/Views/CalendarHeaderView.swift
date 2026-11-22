@@ -9,6 +9,10 @@ public struct CalendarHeaderView: View {
     @Binding var showManageGroupsSheet: Bool
     @Binding var editMode: EditMode
     @State private var isMonthCalendarExpanded: Bool = false
+    @State private var showNewGroupAlert: Bool = false
+    @State private var newGroupName: String = ""
+    @State private var groupToRename: CityGroup?
+    @State private var renameGroupText: String = ""
 
     private var referenceCalendar: Calendar {
         var cal = Calendar(identifier: .gregorian)
@@ -239,15 +243,57 @@ public struct CalendarHeaderView: View {
                             .foregroundStyle(isSelected ? AnyShapeStyle(Color.white) : AnyShapeStyle(.primary))
                         }
                         .buttonStyle(.plain)
+                        .contextMenu {
+                            Button {
+                                renameGroupText = group.name
+                                groupToRename = group
+                            } label: {
+                                Label("Rename Group", systemImage: "pencil")
+                            }
+
+                            Button {
+                                showManageGroupsSheet = true
+                            } label: {
+                                Label("Manage All Groups...", systemImage: "slider.horizontal.3")
+                            }
+
+                            if store.groups.count > 1 {
+                                Divider()
+                                Button(role: .destructive) {
+                                    withAnimation(.snappy) {
+                                        store.deleteGroup(group)
+                                    }
+                                } label: {
+                                    Label("Delete Group", systemImage: "trash")
+                                }
+                            }
+                        }
                     }
+
+                    Button {
+                        newGroupName = ""
+                        showNewGroupAlert = true
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "plus")
+                                .font(.system(size: 11, weight: .bold))
+                            Text("New Group")
+                                .font(.system(size: 12, weight: .semibold))
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color.red.opacity(0.12), in: Capsule())
+                        .foregroundStyle(.red)
+                    }
+                    .buttonStyle(.plain)
 
                     Button {
                         showManageGroupsSheet = true
                     } label: {
                         HStack(spacing: 4) {
-                            Image(systemName: "slider.horizontal.3")
+                            Image(systemName: "ellipsis.circle")
                                 .font(.system(size: 11, weight: .semibold))
-                            Text("Groups")
+                            Text("Edit")
                                 .font(.system(size: 12, weight: .medium))
                         }
                         .padding(.horizontal, 10)
@@ -293,6 +339,42 @@ public struct CalendarHeaderView: View {
                 .opacity(0.6)
         }
         .background(Color(.systemGroupedBackground))
+        .alert("New City Group", isPresented: $showNewGroupAlert) {
+            TextField("Group Name (e.g. Clients, APAC)", text: $newGroupName)
+            Button("Cancel", role: .cancel) {
+                newGroupName = ""
+            }
+            Button("Create") {
+                withAnimation(.snappy) {
+                    store.addGroup(name: newGroupName, iconName: "globe.americas.fill")
+                }
+                newGroupName = ""
+            }
+        } message: {
+            Text("Enter a name for your new city preset group.")
+        }
+        .alert(
+            "Rename Group",
+            isPresented: Binding(
+                get: { groupToRename != nil },
+                set: { if !$0 { groupToRename = nil } }
+            )
+        ) {
+            TextField("Group Name", text: $renameGroupText)
+            Button("Cancel", role: .cancel) {
+                groupToRename = nil
+            }
+            Button("Save") {
+                if let group = groupToRename {
+                    withAnimation(.snappy) {
+                        store.renameGroup(group, to: renameGroupText)
+                    }
+                }
+                groupToRename = nil
+            }
+        } message: {
+            Text("Enter a new name for this group.")
+        }
     }
 
     private func shortWeekdaySymbol(for date: Date) -> String {

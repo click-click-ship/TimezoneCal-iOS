@@ -20,6 +20,9 @@ targets:
     sources:
       - path: Shared
       - path: TimezoneCalApp
+    settings:
+      base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     info:
       path: TimezoneCalApp/Info.plist
       properties:
